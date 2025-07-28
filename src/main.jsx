@@ -19,7 +19,7 @@ const theme = extendTheme({
       700: '#1A4971',
     },
     card: {
-      light: 'gray.100', // Changed to grayish for light mode
+      light: 'gray.100',
       dark: 'gray.800',
     },
     bg: {
@@ -57,13 +57,13 @@ const theme = extendTheme({
     },
     CardHeader: {
       baseStyle: {
-        bg: { base: 'gray.800', _dark: 'gray.800' }, // Grayish for light mode
+        bg: { base: 'gray.800', _dark: 'gray.800' },
         borderTopRadius: 'lg',
       },
     },
     CardBody: {
       baseStyle: {
-        bg: { base: 'gray.800', _dark: 'gray.800' }, // Grayish for light mode
+        bg: { base: 'gray.800', _dark: 'gray.800' },
         borderBottomRadius: 'lg',
       },
     },

@@ -1,11 +1,13 @@
 import { VStack, Button, Collapse, useDisclosure, Box, Text } from '@chakra-ui/react';
-import { FaChevronDown, FaChevronUp, FaAmazon, FaMicrosoft, FaFacebook } from 'react-icons/fa';
+import { FaChevronDown, FaChevronUp, FaAmazon, FaMicrosoft, FaFacebook, FaGoogle, FaNewspaper } from 'react-icons/fa';
 import { IconContext } from 'react-icons';
 
 const companyIcons = {
   FaAmazon,
   FaMicrosoft,
   FaFacebook,
+  FaGoogle,
+  FaNewspaper
 };
 
 const CompanyList = ({ companies, onSelect }) => {
@@ -31,7 +33,7 @@ const CompanyList = ({ companies, onSelect }) => {
                 p={4}
                 borderWidth="1px"
                 borderRadius="lg"
-                borderColor={{ base: 'gray.200', _dark: 'gray.600' }} // Added border for light mode
+                borderColor={{ base: 'gray.200', _dark: 'gray.600' }}
                 _hover={{ bg: { base: 'gray.50', _dark: 'gray.700' }, cursor: 'pointer' }}
                 onClick={() => onSelect(company.name)}
                 role="button"

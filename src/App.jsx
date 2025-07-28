@@ -3,15 +3,21 @@ import { Box, Container, Heading, HStack, VStack, Text, Button, useColorMode } f
 import { FaSun, FaMoon } from 'react-icons/fa';
 import CompanyList from './components/CompanyList.jsx';
 import FlashCardGame from './components/FlashCardGame.jsx';
-import questionsData from './data/amz.json';
+import amzData from './data/amz.json';
+import metaData from './data/meta.json';
+import microsoftData from './data/microsoft.json';
+import googleData from './data/google.json';
+import bloombergData from './data/bloomberg.json';
 
 const App = () => {
   const [selectedCompany, setSelectedCompany] = useState(null);
   const { colorMode, toggleColorMode } = useColorMode();
   const companies = [
-    { name: 'Amazon', icon: 'FaAmazon', questions: questionsData },
-    { name: 'Microsoft', icon: 'FaMicrosoft', questions: [] },
-    { name: 'Meta', icon: 'FaFacebook', questions: [] },
+    { name: 'Amazon', icon: 'FaAmazon', questions: amzData },
+    { name: 'Microsoft', icon: 'FaMicrosoft', questions: microsoftData },
+    { name: 'Meta', icon: 'FaFacebook', questions: metaData },
+    { name: 'Google', icon: 'FaGoogle', questions: googleData },
+    { name: 'Bloomberg', icon: 'FaNewspaper', questions: bloombergData },
   ];
 
   return (
@@ -22,7 +28,7 @@ const App = () => {
             as="h1"
             size={{ base: 'lg', md: '2xl' }}
             textAlign="center"
-            flex="1" // Center heading by using flex
+            flex="1"
           >
             NeetCode Flashcard Game
           </Heading>
