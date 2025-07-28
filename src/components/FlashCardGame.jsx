@@ -1,0 +1,137 @@
+import { useState } from 'react';
+import {
+  Box,
+  Button,
+  Input,
+  VStack,
+  Heading,
+  Text,
+  HStack,
+  Card,
+  CardBody,
+  CardHeader,
+  useColorMode,
+} from '@chakra-ui/react';
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { CopyBlock, dracula, atomOneDark } from 'react-code-blocks';
+
+const FlashCardGame = ({ company, questions, onBack }) => {
+  const [numQuestions, setNumQuestions] = useState('');
+  const [gameStarted, setGameStarted] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedQuestions, setSelectedQuestions] = useState([]);
+  const { colorMode } = useColorMode();
+
+  const startGame = () => {
+    const p = parseInt(numQuestions);
+    if (p > 0 && p <= questions.length) {
+      const shuffled = [...questions].sort(() => Math.random() - 0.5).slice(0, p);
+      setSelectedQuestions(shuffled);
+      setGameStarted(true);
+    }
+  };
+
+  const nextQuestion = () => {
+    if (currentQuestionIndex < selectedQuestions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    }
+  };
+
+  const prevQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+
+  return (
+    <VStack spacing={6} align="stretch">
+      <Button
+        leftIcon={<FaArrowLeft />}
+        onClick={onBack}
+        alignSelf="flex-start"
+        aria-label="Back to company list"
+      >
+        Back
+      </Button>
+      <Heading as="h2" size={{ base: 'md', md: 'lg' }}>
+        {company} Questions
+      </Heading>
+      {!gameStarted ? (
+        <VStack spacing={4}>
+          <Text>How many questions would you like to play?</Text>
+          <HStack>
+            <Input
+              type="number"
+              value={numQuestions}
+              onChange={e => setNumQuestions(e.target.value)}
+              placeholder="Number of questions"
+              maxW={{ base: '150px', md: '200px' }}
+              aria-label="Number of questions"
+            />
+            <Button
+              onClick={startGame}
+              colorScheme="brand"
+              variant="solid"
+              isDisabled={!numQuestions}
+              aria-label="Start game"
+            >
+              Start Game
+            </Button>
+          </HStack>
+        </VStack>
+      ) : (
+        <Card>
+          <CardHeader>
+            <Heading size={{ base: 'sm', md: 'md' }}>
+              Question {currentQuestionIndex + 1} of {selectedQuestions.length}
+            </Heading>
+          </CardHeader>
+          <CardBody>
+            {selectedQuestions[currentQuestionIndex] && (
+              <VStack spacing={4} align="stretch">
+                <Text fontWeight="bold">Problem: {selectedQuestions[currentQuestionIndex].title}</Text>
+                <Text>{selectedQuestions[currentQuestionIndex].description}</Text>
+                <Text fontWeight="bold">Solution:</Text>
+                <CopyBlock
+                  text={selectedQuestions[currentQuestionIndex].solution}
+                  language="python"
+                  showLineNumbers={true}
+                  theme={colorMode === 'light' ? atomOneDark : dracula}
+                  wrapLines
+                  codeBlock
+                />
+                <Text>Pattern: {selectedQuestions[currentQuestionIndex].category}</Text>
+                <Text>Time Complexity: {selectedQuestions[currentQuestionIndex].time_complexity}</Text>
+                <Text>Space Complexity: {selectedQuestions[currentQuestionIndex].space_complexity}</Text>
+                <HStack justify="space-between" flexWrap="wrap">
+                  <Button
+                    onClick={prevQuestion}
+                    isDisabled={currentQuestionIndex === 0}
+                    leftIcon={<FaArrowLeft />}
+                    aria-label="Previous question"
+                    size={{ base: 'sm', md: 'md' }}
+                    m={1}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    onClick={nextQuestion}
+                    isDisabled={currentQuestionIndex === selectedQuestions.length - 1}
+                    rightIcon={<FaArrowRight />}
+                    aria-label="Next question"
+                    size={{ base: 'sm', md: 'md' }}
+                    m={1}
+                  >
+                    Next
+                  </Button>
+                </HStack>
+              </VStack>
+            )}
+          </CardBody>
+        </Card>
+      )}
+    </VStack>
+  );
+};
+
+export default FlashCardGame;

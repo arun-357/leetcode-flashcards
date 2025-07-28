@@ -1,10 +1,94 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+import ReactDOM from 'react-dom/client';
+import { ChakraProvider, extendTheme, ColorModeScript } from '@chakra-ui/react';
+import App from './App.jsx';
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+const theme = extendTheme({
+  config: {
+    initialColorMode: 'dark',
+    useSystemColorMode: false,
+    disableTransitionOnChange: false,
+  },
+  fonts: {
+    heading: `'Inter', sans-serif`,
+    body: `'Inter', sans-serif`,
+  },
+  colors: {
+    brand: {
+      500: '#2B6CB0',
+      600: '#2C5282',
+      700: '#1A4971',
+    },
+    card: {
+      light: 'gray.100', // Changed to grayish for light mode
+      dark: 'gray.800',
+    },
+    bg: {
+      light: 'gray.500',
+      dark: 'gray.900',
+    },
+  },
+  components: {
+    Button: {
+      baseStyle: {
+        fontWeight: 'medium',
+        borderRadius: 'md',
+      },
+      variants: {
+        solid: {
+          bg: 'brand.500',
+          color: 'white',
+          _hover: { bg: 'brand.600' },
+          _dark: {
+            bg: 'brand.700',
+            color: 'white',
+            _hover: { bg: 'brand.600' },
+          },
+        },
+      },
+    },
+    Card: {
+      baseStyle: {
+        container: {
+          borderRadius: 'lg',
+          boxShadow: 'md',
+          bg: { base: 'card.light', _dark: 'card.dark' },
+        },
+      },
+    },
+    CardHeader: {
+      baseStyle: {
+        bg: { base: 'gray.800', _dark: 'gray.800' }, // Grayish for light mode
+        borderTopRadius: 'lg',
+      },
+    },
+    CardBody: {
+      baseStyle: {
+        bg: { base: 'gray.800', _dark: 'gray.800' }, // Grayish for light mode
+        borderBottomRadius: 'lg',
+      },
+    },
+  },
+  styles: {
+    global: {
+      body: {
+        bg: { base: 'bg.light', _dark: 'bg.dark' },
+      },
+      pre: {
+        overflowX: 'auto',
+        whiteSpace: 'pre-wrap',
+        wordBreak: 'break-word',
+        maxW: '100%',
+        fontSize: { base: 'sm', md: 'md' },
+      },
+    },
+  },
+});
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <>
+    <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+    <ChakraProvider theme={theme}>
+      <App />
+    </ChakraProvider>
+  </>
+);
