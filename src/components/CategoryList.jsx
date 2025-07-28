@@ -1,17 +1,18 @@
 import { VStack, Button, Collapse, useDisclosure, Box, Text } from '@chakra-ui/react';
-import { FaChevronDown, FaChevronUp, FaAmazon, FaMicrosoft, FaFacebook, FaGoogle, FaNewspaper } from 'react-icons/fa';
+import { FaChevronDown, FaChevronUp, FaAmazon, FaMicrosoft, FaFacebook, FaGoogle, FaNewspaper, FaCodeBranch } from 'react-icons/fa';
 import { IconContext } from 'react-icons';
 
-const companyIcons = {
+const categoryIcons = {
   FaAmazon,
   FaMicrosoft,
   FaFacebook,
   FaGoogle,
-  FaNewspaper
+  FaNewspaper,
+  FaCodeBranch,
 };
 
-const CompanyList = ({ companies, onSelect }) => {
-  const { isOpen, onToggle } = useDisclosure({ defaultIsOpen: true });
+const CategoryList = ({ title, categories, onSelect }) => {
+  const { isOpen, onToggle } = useDisclosure({ defaultIsOpen: false });
 
   return (
     <VStack spacing={4} align="stretch">
@@ -19,26 +20,26 @@ const CompanyList = ({ companies, onSelect }) => {
         onClick={onToggle}
         variant="outline"
         rightIcon={isOpen ? <FaChevronUp /> : <FaChevronDown />}
-        aria-label={isOpen ? 'Collapse company list' : 'Expand company list'}
+        aria-label={isOpen ? `Collapse ${title} list` : `Expand ${title} list`}
       >
-        Companies
+        {title}
       </Button>
       <Collapse in={isOpen}>
         <VStack spacing={2} align="stretch">
-          {companies.map(company => {
-            const Icon = companyIcons[company.icon] || FaAmazon;
+          {categories.map(category => {
+            const Icon = categoryIcons[category.icon] || FaCodeBranch;
             return (
               <Box
-                key={company.name}
+                key={category.name}
                 p={4}
                 borderWidth="1px"
                 borderRadius="lg"
                 borderColor={{ base: 'gray.200', _dark: 'gray.600' }}
                 _hover={{ bg: { base: 'gray.50', _dark: 'gray.700' }, cursor: 'pointer' }}
-                onClick={() => onSelect(company.name)}
+                onClick={() => onSelect(category.name)}
                 role="button"
                 tabIndex={0}
-                onKeyPress={e => e.key === 'Enter' && onSelect(company.name)}
+                onKeyPress={e => e.key === 'Enter' && onSelect(category.name)}
                 display="flex"
                 alignItems="center"
               >
@@ -46,9 +47,9 @@ const CompanyList = ({ companies, onSelect }) => {
                   <Icon />
                 </IconContext.Provider>
                 <Box>
-                  <Text fontWeight="medium">{company.name}</Text>
+                  <Text fontWeight="medium">{category.name}</Text>
                   <Text fontSize="sm" color={{ base: 'gray.500', _dark: 'gray.400' }}>
-                    {company.questions.length} questions
+                    {category.questions.length} questions
                   </Text>
                 </Box>
               </Box>
@@ -60,4 +61,4 @@ const CompanyList = ({ companies, onSelect }) => {
   );
 };
 
-export default CompanyList;
+export default CategoryList;

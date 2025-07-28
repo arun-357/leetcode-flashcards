@@ -23,7 +23,7 @@ const theme = extendTheme({
       dark: 'gray.800',
     },
     bg: {
-      light: 'gray.500',
+      light: 'yellow.800',
       dark: 'gray.900',
     },
   },
@@ -57,13 +57,13 @@ const theme = extendTheme({
     },
     CardHeader: {
       baseStyle: {
-        bg: { base: 'gray.800', _dark: 'gray.800' },
+        bg: { base: 'gray.100', _dark: 'gray.800' },
         borderTopRadius: 'lg',
       },
     },
     CardBody: {
       baseStyle: {
-        bg: { base: 'gray.800', _dark: 'gray.800' },
+        bg: { base: 'gray.100', _dark: 'gray.800' },
         borderBottomRadius: 'lg',
       },
     },
@@ -72,6 +72,9 @@ const theme = extendTheme({
     global: {
       body: {
         bg: { base: 'bg.light', _dark: 'bg.dark' },
+        color: { base: 'gray.800', _dark: 'gray.100' },
+        transitionProperty: 'background-color, color',
+        transitionDuration: '0.2s',
       },
       pre: {
         overflowX: 'auto',

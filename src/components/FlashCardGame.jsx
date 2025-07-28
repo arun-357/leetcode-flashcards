@@ -15,7 +15,7 @@ import {
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { CopyBlock, dracula, atomOneDark } from 'react-code-blocks';
 
-const FlashCardGame = ({ company, questions, onBack }) => {
+const FlashCardGame = ({ company, pattern, questions, onBack }) => {
   const [numQuestions, setNumQuestions] = useState('');
   const [gameStarted, setGameStarted] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -49,12 +49,12 @@ const FlashCardGame = ({ company, questions, onBack }) => {
         leftIcon={<FaArrowLeft />}
         onClick={onBack}
         alignSelf="flex-start"
-        aria-label="Back to company list"
+        aria-label="Back to main page"
       >
         Back
       </Button>
       <Heading as="h2" size={{ base: 'md', md: 'lg' }}>
-        {company} Questions
+        {company || pattern} Questions
       </Heading>
       {!gameStarted ? (
         <VStack spacing={4}>
