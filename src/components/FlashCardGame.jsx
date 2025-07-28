@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { CopyBlock, dracula, atomOneDark } from 'react-code-blocks';
+import ReactMarkdown from 'react-markdown';
 
 const FlashCardGame = ({ company, pattern, questions, onBack }) => {
   const [numQuestions, setNumQuestions] = useState('');
@@ -90,7 +91,36 @@ const FlashCardGame = ({ company, pattern, questions, onBack }) => {
             {selectedQuestions[currentQuestionIndex] && (
               <VStack spacing={4} align="stretch">
                 <Text fontWeight="bold">Problem: {selectedQuestions[currentQuestionIndex].title}</Text>
-                <Text>{selectedQuestions[currentQuestionIndex].description}</Text>
+                <Box>
+                  <ReactMarkdown
+                    components={{
+                      code({ inline, className, children, ...props }) {
+                        return inline ? (
+                          <code className={className} {...props}>
+                            {children}
+                          </code>
+                        ) : (
+                          <CopyBlock
+                            text={String(children).trim()}
+                            language="text"
+                            showLineNumbers={false}
+                            theme={colorMode === 'light' ? atomOneDark : dracula}
+                            wrapLines
+                            codeBlock
+                          />
+                        );
+                      },
+                      p({ children }) {
+                        return <Text mb={2}>{children}</Text>;
+                      },
+                      strong({ children }) {
+                        return <Text as="span" fontWeight="bold">{children}</Text>;
+                      },
+                    }}
+                  >
+                    {selectedQuestions[currentQuestionIndex].description}
+                  </ReactMarkdown>
+                </Box>
                 <Text fontWeight="bold">Solution:</Text>
                 <CopyBlock
                   text={selectedQuestions[currentQuestionIndex].solution}
