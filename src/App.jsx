@@ -141,24 +141,30 @@ const App = () => {
               borderColor={{ base: 'gray.200', _dark: 'gray.600' }}
               bg={{ base: 'gray.50', _dark: 'gray.700' }}
             >
-              <HStack>
-                <Input
-                  placeholder="Search questions..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  maxW={{ base: '100%', md: '400px' }}
-                  aria-label="Search questions"
-                />
-                <Button
-                  aria-label="Search"
-                  variant="outline"
-                  leftIcon={<FaMagnifyingGlass />}
-                  isDisabled={!searchQuery}
-                >
-                  Search
-                </Button>
-              </HStack>
-              {searchQuery && <SearchResults results={searchResults} onSelect={handleSearchSelect} />}
+              <VStack spacing={4}>
+                <HStack justify="center" w="100%">
+                  <Input
+                    placeholder="Search questions..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    maxW={{ base: '100%', md: '400px' }}
+                    aria-label="Search questions"
+                  />
+                  <Button
+                    aria-label="Search"
+                    variant="outline"
+                    leftIcon={<FaMagnifyingGlass />}
+                    isDisabled={!searchQuery}
+                  >
+                    Search
+                  </Button>
+                </HStack>
+                {searchQuery && (
+                  <Box w="100%">
+                    <SearchResults results={searchResults} onSelect={handleSearchSelect} />
+                  </Box>
+                )}
+              </VStack>
             </Box>
           </VStack>
         )}
