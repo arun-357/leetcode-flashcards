@@ -92,7 +92,7 @@ const App = () => {
             textAlign="center"
             flex="1"
           >
-            NeetCode Flashcard Game
+            LeetCode Flashcard Game
           </Heading>
           <Button
             onClick={toggleColorMode}
