@@ -23,7 +23,7 @@ const theme = extendTheme({
       dark: 'gray.800',
     },
     bg: {
-      light: 'yellow.800',
+      light: 'yellow.50',
       dark: 'gray.900',
     },
   },
@@ -81,6 +81,10 @@ const theme = extendTheme({
         whiteSpace: 'pre-wrap',
         wordBreak: 'break-word',
         maxW: '100%',
+        fontSize: { base: 'sm', md: 'md' },
+      },
+      code: {
+        fontFamily: `'Source Code Pro', monospace`,
         fontSize: { base: 'sm', md: 'md' },
       },
     },

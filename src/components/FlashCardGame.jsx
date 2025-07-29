@@ -16,7 +16,7 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { CopyBlock, dracula, atomOneDark } from 'react-code-blocks';
 import ReactMarkdown from 'react-markdown';
 
-const FlashCardGame = ({ company, pattern, questions, onBack }) => {
+const FlashCardGame = ({ company, pattern, questions, onBack, categoryType }) => {
   const [numQuestions, setNumQuestions] = useState('');
   const [gameStarted, setGameStarted] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -44,6 +44,8 @@ const FlashCardGame = ({ company, pattern, questions, onBack }) => {
     }
   };
 
+  const isSingleQuestion = questions.length === 1 && categoryType === 'search';
+
   return (
     <VStack spacing={6} align="stretch">
       <Button
@@ -55,9 +57,9 @@ const FlashCardGame = ({ company, pattern, questions, onBack }) => {
         Back
       </Button>
       <Heading as="h2" size={{ base: 'md', md: 'lg' }}>
-        {company || pattern} Questions
+        {company || pattern || 'Question'} Questions
       </Heading>
-      {!gameStarted ? (
+      {!gameStarted && !isSingleQuestion ? (
         <VStack spacing={4}>
           <Text>How many questions would you like to play?</Text>
           <HStack>
@@ -84,13 +86,18 @@ const FlashCardGame = ({ company, pattern, questions, onBack }) => {
         <Card>
           <CardHeader>
             <Heading size={{ base: 'sm', md: 'md' }}>
-              Question {currentQuestionIndex + 1} of {selectedQuestions.length}
+              {isSingleQuestion
+                ? `Question: ${questions[0].title}`
+                : `Question ${currentQuestionIndex + 1} of ${selectedQuestions.length}`}
             </Heading>
           </CardHeader>
           <CardBody>
-            {selectedQuestions[currentQuestionIndex] && (
+            {(isSingleQuestion ? questions : selectedQuestions)[currentQuestionIndex] && (
               <VStack spacing={4} align="stretch">
-                <Text fontWeight="bold">Problem: {selectedQuestions[currentQuestionIndex].title}</Text>
+                <Text fontWeight="bold">
+                  Problem:{' '}
+                  {(isSingleQuestion ? questions : selectedQuestions)[currentQuestionIndex].title}
+                </Text>
                 <Box>
                   <ReactMarkdown
                     components={{
@@ -118,43 +125,54 @@ const FlashCardGame = ({ company, pattern, questions, onBack }) => {
                       },
                     }}
                   >
-                    {selectedQuestions[currentQuestionIndex].description}
+                    {(isSingleQuestion ? questions : selectedQuestions)[currentQuestionIndex].description}
                   </ReactMarkdown>
                 </Box>
                 <Text fontWeight="bold">Solution:</Text>
                 <CopyBlock
-                  text={selectedQuestions[currentQuestionIndex].solution}
+                  text={(isSingleQuestion ? questions : selectedQuestions)[currentQuestionIndex].solution}
                   language="python"
                   showLineNumbers={true}
                   theme={colorMode === 'light' ? atomOneDark : dracula}
                   wrapLines
                   codeBlock
                 />
-                <Text>Pattern: {selectedQuestions[currentQuestionIndex].category}</Text>
-                <Text>Time Complexity: {selectedQuestions[currentQuestionIndex].time_complexity}</Text>
-                <Text>Space Complexity: {selectedQuestions[currentQuestionIndex].space_complexity}</Text>
-                <HStack justify="space-between" flexWrap="wrap">
-                  <Button
-                    onClick={prevQuestion}
-                    isDisabled={currentQuestionIndex === 0}
-                    leftIcon={<FaArrowLeft />}
-                    aria-label="Previous question"
-                    size={{ base: 'sm', md: 'md' }}
-                    m={1}
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    onClick={nextQuestion}
-                    isDisabled={currentQuestionIndex === selectedQuestions.length - 1}
-                    rightIcon={<FaArrowRight />}
-                    aria-label="Next question"
-                    size={{ base: 'sm', md: 'md' }}
-                    m={1}
-                  >
-                    Next
-                  </Button>
-                </HStack>
+                <Text>
+                  Pattern:{' '}
+                  {(isSingleQuestion ? questions : selectedQuestions)[currentQuestionIndex].category}
+                </Text>
+                <Text>
+                  Time Complexity:{' '}
+                  {(isSingleQuestion ? questions : selectedQuestions)[currentQuestionIndex].time_complexity}
+                </Text>
+                <Text>
+                  Space Complexity:{' '}
+                  {(isSingleQuestion ? questions : selectedQuestions)[currentQuestionIndex].space_complexity}
+                </Text>
+                {!isSingleQuestion && (
+                  <HStack justify="space-between" flexWrap="wrap">
+                    <Button
+                      onClick={prevQuestion}
+                      isDisabled={currentQuestionIndex === 0}
+                      leftIcon={<FaArrowLeft />}
+                      aria-label="Previous question"
+                      size={{ base: 'sm', md: 'md' }}
+                      m={1}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      onClick={nextQuestion}
+                      isDisabled={currentQuestionIndex === selectedQuestions.length - 1}
+                      rightIcon={<FaArrowRight />}
+                      aria-label="Next question"
+                      size={{ base: 'sm', md: 'md' }}
+                      m={1}
+                    >
+                      Next
+                    </Button>
+                  </HStack>
+                )}
               </VStack>
             )}
           </CardBody>

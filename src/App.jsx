@@ -1,8 +1,10 @@
-import { useState } from 'react';
-import { Container, Heading, HStack, VStack, Text, Button, useColorMode } from '@chakra-ui/react';
+import { useState, useMemo } from 'react';
+import { Container, Heading, HStack, VStack, Text, Button, Input, Box, useColorMode } from '@chakra-ui/react';
 import { FaSun, FaMoon } from 'react-icons/fa';
+import { FaMagnifyingGlass } from "react-icons/fa6";
 import CategoryList from './components/CategoryList.jsx';
 import FlashCardGame from './components/FlashCardGame.jsx';
+import SearchResults from './components/SearchResults.jsx';
 import amzData from './data/amz.json';
 import metaData from './data/meta.json';
 import microsoftData from './data/microsoft.json';
@@ -12,16 +14,17 @@ import patternQuestions from './data/patterns.json';
 
 const App = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [categoryType, setCategoryType] = useState(null); // 'company' or 'pattern'
+  const [categoryType, setCategoryType] = useState(null); // 'company', 'pattern', or 'search'
+  const [searchQuery, setSearchQuery] = useState('');
   const { colorMode, toggleColorMode } = useColorMode();
 
-  const companies = [
+  const companies = useMemo(() => [
     { name: 'Amazon', icon: 'FaAmazon', questions: amzData },
     { name: 'Microsoft', icon: 'FaMicrosoft', questions: microsoftData },
     { name: 'Meta', icon: 'FaFacebook', questions: metaData },
     { name: 'Google', icon: 'FaGoogle', questions: googleData },
     { name: 'Bloomberg', icon: 'FaNewspaper', questions: bloombergData },
-  ];
+  ], []);
 
   const patterns = Object.keys(patternQuestions).map(pattern => ({
     name: pattern,
@@ -29,9 +32,54 @@ const App = () => {
     questions: patternQuestions[pattern],
   }));
 
+  const allQuestions = useMemo(() => {
+    const questionMap = new Map();
+
+    patterns.forEach(pattern =>
+      pattern.questions.forEach(q => {
+        questionMap.set(q.title, {
+          ...q,
+          source: pattern.name,
+          sourceType: 'pattern',
+        });
+      })
+    );
+
+    companies.forEach(company =>
+      company.questions.forEach(q => {
+        if (!questionMap.has(q.title)) {
+          questionMap.set(q.title, {
+            ...q,
+            source: company.name,
+            sourceType: 'company',
+          });
+        }
+      })
+    );
+
+    return Array.from(questionMap.values());
+  }, [companies, patterns]);
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery) return [];
+    const regex = new RegExp(searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    return allQuestions.filter(
+      q =>
+        regex.test(q.title) ||
+        regex.test(q.description) ||
+        regex.test(q.category)
+    );
+  }, [searchQuery, allQuestions]);
+
   const handleSelect = (name, type) => {
     setSelectedCategory(name);
     setCategoryType(type);
+    setSearchQuery('');
+  };
+
+  const handleSearchSelect = question => {
+    setSelectedCategory(question);
+    setCategoryType('search');
   };
 
   return (
@@ -61,8 +109,11 @@ const App = () => {
           <FlashCardGame
             company={categoryType === 'company' ? selectedCategory : undefined}
             pattern={categoryType === 'pattern' ? selectedCategory : undefined}
+            categoryType={categoryType}
             questions={
-              categoryType === 'company'
+              categoryType === 'search'
+                ? [selectedCategory]
+                : categoryType === 'company'
                 ? companies.find(c => c.name === selectedCategory).questions
                 : patterns.find(p => p.name === selectedCategory).questions
             }
@@ -83,6 +134,32 @@ const App = () => {
               categories={patterns}
               onSelect={name => handleSelect(name, 'pattern')}
             />
+            <Box
+              p={4}
+              borderWidth="1px"
+              borderRadius="lg"
+              borderColor={{ base: 'gray.200', _dark: 'gray.600' }}
+              bg={{ base: 'gray.50', _dark: 'gray.700' }}
+            >
+              <HStack>
+                <Input
+                  placeholder="Search questions..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  maxW={{ base: '100%', md: '400px' }}
+                  aria-label="Search questions"
+                />
+                <Button
+                  aria-label="Search"
+                  variant="outline"
+                  leftIcon={<FaMagnifyingGlass />}
+                  isDisabled={!searchQuery}
+                >
+                  Search
+                </Button>
+              </HStack>
+              {searchQuery && <SearchResults results={searchResults} onSelect={handleSearchSelect} />}
+            </Box>
           </VStack>
         )}
       </VStack>
