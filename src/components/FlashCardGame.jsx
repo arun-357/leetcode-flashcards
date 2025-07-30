@@ -18,9 +18,12 @@ import ReactMarkdown from 'react-markdown';
 
 const FlashCardGame = ({ company, pattern, questions, onBack, categoryType }) => {
   const [numQuestions, setNumQuestions] = useState('');
-  const [gameStarted, setGameStarted] = useState(false);
+  const [gameStarted, setGameStarted] = useState(!!pattern);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedQuestions, setSelectedQuestions] = useState([]);
+  const [selectedQuestions, setSelectedQuestions] = useState(
+    pattern ? [...questions].sort(() => Math.random() - 0.5) : []
+  );
+  const [errorMessage, setErrorMessage] = useState('');
   const { colorMode } = useColorMode();
 
   const startGame = () => {
@@ -29,6 +32,9 @@ const FlashCardGame = ({ company, pattern, questions, onBack, categoryType }) =>
       const shuffled = [...questions].sort(() => Math.random() - 0.5).slice(0, p);
       setSelectedQuestions(shuffled);
       setGameStarted(true);
+      setErrorMessage('');
+    } else {
+      setErrorMessage(`Please enter a number between 1 and ${questions.length}.`);
     }
   };
 
@@ -81,6 +87,11 @@ const FlashCardGame = ({ company, pattern, questions, onBack, categoryType }) =>
               Start Game
             </Button>
           </HStack>
+          {errorMessage && (
+            <Text color="red.500" fontSize="sm">
+              {errorMessage}
+            </Text>
+          )}
         </VStack>
       ) : (
         <Card>
