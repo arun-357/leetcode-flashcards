@@ -1,3 +1,4 @@
+// src/components/FlashCardGame.jsx
 import { useState } from 'react';
 import {
   Box,
@@ -16,7 +17,7 @@ import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { CopyBlock, dracula, atomOneDark } from 'react-code-blocks';
 import ReactMarkdown from 'react-markdown';
 
-const FlashCardGame = ({ company, pattern, questions, onBack, categoryType }) => {
+const FlashCardGame = ({ company, pattern, questions, onBack }) => {
   const [numQuestions, setNumQuestions] = useState('');
   const [gameStarted, setGameStarted] = useState(!!pattern);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -50,7 +51,7 @@ const FlashCardGame = ({ company, pattern, questions, onBack, categoryType }) =>
     }
   };
 
-  const isSingleQuestion = questions.length === 1 && categoryType === 'search';
+  const isSingleQuestion = questions.length === 1 && !company && !pattern;
 
   return (
     <VStack spacing={6} align="stretch">

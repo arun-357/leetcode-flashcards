@@ -5,11 +5,7 @@ import { FaMagnifyingGlass } from "react-icons/fa6";
 import CategoryList from './components/CategoryList.jsx';
 import FlashCardGame from './components/FlashCardGame.jsx';
 import SearchResults from './components/SearchResults.jsx';
-import amzData from './data/amz.json';
-import metaData from './data/meta.json';
-import microsoftData from './data/microsoft.json';
-import googleData from './data/google.json';
-import bloombergData from './data/bloomberg.json';
+import companyData from './data/companies.json';
 import patternQuestions from './data/patterns.json';
 
 const App = () => {
@@ -18,13 +14,14 @@ const App = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const { colorMode, toggleColorMode } = useColorMode();
 
-  const companies = useMemo(() => [
-    { name: 'Amazon', icon: 'FaAmazon', questions: amzData },
-    { name: 'Microsoft', icon: 'FaMicrosoft', questions: microsoftData },
-    { name: 'Meta', icon: 'FaFacebook', questions: metaData },
-    { name: 'Google', icon: 'FaGoogle', questions: googleData },
-    { name: 'Bloomberg', icon: 'FaNewspaper', questions: bloombergData },
-  ], []);
+  const companies = [
+    { name: 'Amazon', icon: 'FaAmazon', questions: companyData.Amazon || [] },
+    { name: 'Microsoft', icon: 'FaMicrosoft', questions: companyData.Microsoft || [] },
+    { name: 'Meta', icon: 'FaFacebook', questions: companyData.Meta || [] },
+    { name: 'Google', icon: 'FaGoogle', questions: companyData.Google || [] },
+    { name: 'Bloomberg', icon: 'FaNewspaper', questions: companyData.Bloomberg || [] },
+    { name: 'Apple', icon: 'FaApple', questions: companyData.Apple || [] },
+  ];
 
   const patterns = Object.keys(patternQuestions).map(pattern => ({
     name: pattern,
@@ -45,12 +42,12 @@ const App = () => {
       })
     );
 
-    companies.forEach(company =>
-      company.questions.forEach(q => {
+    Object.keys(companyData).forEach(companyName =>
+      companyData[companyName].forEach(q => {
         if (!questionMap.has(q.title)) {
           questionMap.set(q.title, {
             ...q,
-            source: company.name,
+            source: companyName,
             sourceType: 'company',
           });
         }
