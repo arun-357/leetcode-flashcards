@@ -1,5 +1,5 @@
 import { VStack, Button, Collapse, useDisclosure, Box, Text } from '@chakra-ui/react';
-import { FaChevronDown, FaChevronUp, FaAmazon, FaMicrosoft, FaFacebook, FaGoogle, FaNewspaper, FaCodeBranch } from 'react-icons/fa';
+import { FaChevronDown, FaChevronUp, FaAmazon, FaMicrosoft, FaFacebook, FaGoogle, FaNewspaper, FaCodeBranch, FaApple } from 'react-icons/fa';
 import { IconContext } from 'react-icons';
 
 const categoryIcons = {
@@ -9,6 +9,7 @@ const categoryIcons = {
   FaGoogle,
   FaNewspaper,
   FaCodeBranch,
+  FaApple
 };
 
 const CategoryList = ({ title, categories, onSelect }) => {
