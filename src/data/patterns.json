@@ -217,6 +217,18 @@
       "space_complexity": "O(1)"
     },
     {
+      "title": "longest-subarray-with-maximum-bitwise-and",
+      "difficulty": "",
+      "category": "Bit Manipulation",
+      "link": "",
+      "slug": "longest-subarray-with-maximum-bitwise-and",
+      "description": "Return the length of the longest contiguous subarray whose bitwise AND equals the maximum AND possible (which is max(nums)).",
+      "solution": "from typing import List\n\nclass Solution:\n    def longestSubarray(self, nums: List[int]) -> int:\n        # Edge: empty array (problem constraints typically avoid this, but safe-guard)\n        if not nums:\n         return 0\n\n        # 1) Find the global maximum value in the array.\n        #    The maximum possible bitwise AND of any subarray is this value.\n        mx = max(nums)\n\n        # 2) Scan once to find the longest consecutive run of 'mx'\n        longest = 0      # best run length found so far\n        cur = 0          # current run length of consecutive mx\n\n        for x in nums:\n            if x == mx:\n                # extend current run\n            cur += 1\n                # record if this run is the longest seen\n                if cur > longest:\n                    longest = cur\n            else:\n                # run broken, reset current run length\n                cur = 0\n\n        return longest",
+      "explanation": "NA",
+      "time_complexity": "O(n)",
+      "space_complexity": "O(1)"
+    },
+    {
       "title": "smallest-subarrays-with-maximum-bitwise-or",
       "difficulty": "",
       "category": "Bit Manipulation",
