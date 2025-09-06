@@ -217,6 +217,18 @@
       "space_complexity": "O(1)"
     },
     {
+      "title": "smallest-subarrays-with-maximum-bitwise-or",
+      "difficulty": "",
+      "category": "Bit Manipulation",
+      "link": "",
+      "slug": "smallest-subarrays-with-maximum-bitwise-or",
+      "description": "For each starting index i, we want the smallest subarray length such that its OR equals the maximum OR possible from i to the end of the array.",
+      "solution": "from typing import List\n\nclass Solution:\n    def smallestSubarrays(self, A: List[int]) -> List[int]:\n        n = len(A)\n        res = [0] * n\n\n        # last[j] = the last index (to the right) where bit j (0..31) was seen\n        # initialized as 0 because we'll overwrite as we go from right to left\n        last = [0] * 32\n\n        # Traverse from rightmost index to left\n        for i in range(n - 1, -1, -1):\n            # Step 1: Update last occurrence for all bits set in A[i]\n            for j in range(32):\n                # (1 << j) is a mask with only the j-th bit set.\n             # A[i] & (1 << j) checks whether the j-th bit of A[i] is 1.\n              if A[i] & (1 << j):\n                    last[j] = i   # record that bit j is last seen at index i\n\n            # Step 2: Find the farthest index we must include in the subarray\n            # Why? The maximum OR from index i requires *all 1-bits*\n            # that appear anywhere in the suffix starting at i.\n            # So we look at the farthest right index among all last-seen bits.\n            farthest_index = max(last)\n\n            # Step 3: Compute subarray length\n            # Smallest subarray length = (end_index - start_index + 1)\n            # Here:\n            #   start_index = i\n           #   end_index   = farthest_index\n            #\n            # This guarantees the subarray [i .. farthest_index] contains\n            # all the bits needed to achieve the maximum OR for suffix(i).\n            res[i] = max(1, farthest_index - i + 1)\n\n        return res",
+      "explanation": "NA",
+      "time_complexity": "O(n)",
+      "space_complexity": "O(1)"
+    },
+    {
       "title": "bitwise-xor-of-all-pairings",
       "difficulty": "",
       "category": "Bit Manipulation",
