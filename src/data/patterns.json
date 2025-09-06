@@ -241,6 +241,18 @@
       "space_complexity": "O(1)"
     },
     {
+      "title": "find-subarray-with-bitwise-or-closest-to-k",
+      "difficulty": "",
+      "category": "Bit Manipulation",
+      "link": "",
+      "slug": "find-subarray-with-bitwise-or-closest-to-k",
+      "description": "For every contiguous subarray compute its OR (in compressed form via `cur`),\nand return the minimum absolute difference between any such OR and k.",
+      "solution": "from typing import List\n\nclass Solution:\n    def minimumDifference(self, nums: List[int], k: int) -> int:\n\n        res = set()   # all distinct OR values of all subarrays (optional, can be avoided)\n        cur = set()   # distinct OR values of subarrays ending at previous index\n\n        for x in nums:\n            # Extend every previous-ending subarray by x, and include [x] itself.\n            # cur becomes the set of distinct ORs for subarrays ending at current index.\n            cur = {x | y for y in cur} | {x}\n\n            # Add these into the global set of OR-values\n            res |= cur\n\n        # Now res contains distinct ORs for every non-empty subarray.\n        # Return the minimal absolute difference to k.\n        return min(abs(val - k) for val in res)",
+      "explanation": "NA",
+      "time_complexity": "O(n)",
+      "space_complexity": "O(1)"
+    },
+    {
       "title": "longest-subarray-with-maximum-bitwise-and",
       "difficulty": "",
       "category": "Bit Manipulation",
