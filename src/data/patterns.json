@@ -229,6 +229,18 @@
       "space_complexity": "O(1)"
     },
     {
+      "title": "largest-combination-with-bitwise-and-greater-than-zero",
+      "difficulty": "",
+      "category": "Bit Manipulation",
+      "link": "",
+      "slug": "largest-combination-with-bitwise-and-greater-than-zero",
+      "description": "LeetCode 2275: Largest Combination With Bitwise AND > 0.\n\n  Problem restatement:\n  - We want the size of the largest subset of candidates such that\n    the AND of all chosen numbers is > 0.\n  - Key: For the AND of a group to be > 0, there must be at least\n    one bit position that is '1' in *all* chosen numbers.\n\n  Intuition:\n  - Instead of thinking in subsets directly, flip the perspective:\n    Which bit positions are common among the chosen numbers?\n  - For each bit position (0..31), count how many numbers in\n    candidates have that bit set.\n  - The maximum such count across all bit positions is the answer.\n    Why? Because that many numbers can form a subset where the AND\n    is guaranteed to keep that bit = 1, thus making AND > 0.\n\n  Approach:\n  1. Iterate over 32 bits (since constraints are within 10^7, fits in 32 bits).\n  2. For each bit position i:\n      - Count how many numbers have this bit set.\n      - Keep track of the maximum count seen.\n  3. Return that maximum count.\n\n  Time:  O(32 * n) = O(n), since 32 is constant.\n  Space: O(1), only counters used.",
+      "solution": "from typing import List\n\nclass Solution:\n    def largestCombination(self, candidates: List[int]) -> int:\n        max_val = 0  # result: largest subset size found so far\n\n        # Check each bit position from 0 to 31\n        for i in range(32):\n            bit_cnt = 0  # count how many numbers have bit i set\n\n            # Scan through all candidates\n           for x in candidates:\n                # (1 << i) = mask with only bit i set\n                # (x & (1 << i)) checks if that bit is set in x\n             if x & (1 << i):\n                    bit_cnt += 1\n\n            # Update max_val with the best count so far\n            max_val = max(max_val, bit_cnt)\n\n        return max_val",
+      "explanation": "NA",
+      "time_complexity": "O(n)",
+      "space_complexity": "O(1)"
+    },
+    {
       "title": "longest-subarray-with-maximum-bitwise-and",
       "difficulty": "",
       "category": "Bit Manipulation",
