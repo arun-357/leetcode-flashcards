@@ -2700,6 +2700,18 @@
   ],
   "Depth First Search (DFS)": [
     {
+      "title": "Flood Fill",
+      "difficulty": "",
+      "category": "Depth First Search (DFS)",
+      "link": "",
+      "slug": "flood-fill",
+      "description": "You are given an image represented by an m x n grid of integers image, where image[i][j] represents the pixel value of the image. You are also given three integers sr, sc, and color. Your task is to perform a flood fill on the image starting from the pixel image[sr][sc].\nTo perform a flood fill:\n    Begin with the starting pixel and change its color to color.\n    Perform the same process for each pixel that is directly adjacent (pixels that share a side with the original pixel, either horizontally or vertically) and shares the same color as the starting pixel.\n    Keep repeating this process by checking neighboring pixels of the updated pixels and modifying their color if it matches the original color of the starting pixel.\n    The process stops when there are no more adjacent pixels of the original color to update.\n    Return the modified image after performing the flood fill.",
+      "solution": "class Solution:\n    def floodFill(self, image: List[List[int]], sr: int, sc: int, color: int) -> List[List[int]]:\n        directions = {(1, 0), (-1, 0), (0, 1), (0, -1)}\n        rows, cols = len(image), len(image[0])\n\n        original_color = image[sr][sc]\n        if original_color == color:\n            return image\n\n        def dfs(r, c, original_color):\n            if (not (0 <= r < rows) or \n               not (0 <= c < cols) or \n               image[r][c] != original_color):\n               return \n\n            image[r][c] = color\n\n            for dr, dc in directions:\n                nr, nc = dr + r, dc + c\n            dfs(nr, nc, original_color)\n                    \n        dfs(sr, sc, image[sr][sc])\n        return image",
+      "explanation": "NA",
+      "time_complexity": "O(R * C)",
+      "space_complexity": "O(R * C)"
+    },
+    {
       "title": "Number of Islands",
       "difficulty": "Medium",
       "category": "Depth First Search (DFS)",
@@ -2969,6 +2981,18 @@
     }
   ],
   "Union Find": [
+    {
+      "title": "Graph Valid Tree",
+      "difficulty": "",
+      "category": "Union Find",
+      "link": "",
+      "slug": "graph-valid-tree",
+      "description": "You are given an image represented by an m x n grid of integers image, where image[i][j] represents the pixel value of the image. You are also given three integers sr, sc, and color. Your task is to perform a flood fill on the image starting from the pixel image[sr][sc].\nTo perform a flood fill:\n    Begin with the starting pixel and change its color to color.\n    Perform the same process for each pixel that is directly adjacent (pixels that share a side with the original pixel, either horizontally or vertically) and shares the same color as the starting pixel.\n    Keep repeating this process by checking neighboring pixels of the updated pixels and modifying their color if it matches the original color of the starting pixel.\n    The process stops when there are no more adjacent pixels of the original color to update.\n    Return the modified image after performing the flood fill.",
+      "solution": "from typing import List\n\nclass Solution:\n    def validTree(self, n: int, edges: List[List[int]]) -> bool:\n        # Necessary condition for a tree\n        if len(edges) != n - 1:\n            return False\n\n        # -------------------------\n        # Disjoint Set (your code)\n        # -------------------------\n        par = [i for i in range(n)]\n        rank = [1] * n  # using \"size\" semantics (stores subtree size)\n\n        def find(x: int) -> int:\n            # iterative path-compression find\n            while x != par[x]:\n                par[x] = par[par[x]]  # path compression (point to grandparent)\n                x = par[x]\n            return x\n\n        def union(a: int, b: int) -> int:\n            # Returns True if union happened (different sets), False if already same set (cycle)\n            p1, p2 = find(a), find(b)\n            if p1 == p2:\n                return False\n                \n            # union by size (rank holds sizes)\n            if rank[p1] >= rank[p2]:\n                par[p2] = p1\n                rank[p1] += rank[p2]\n            else:\n                par[p1] = p2\n                rank[p2] += rank[p1]\n            return True\n\n        # -------------------------\n        # Use DSU to detect cycle\n        # -------------------------\n        for u, v in edges:\n            if not union(u, v):\n                # attempted to union two nodes in same set -> cycle\n                return False\n\n        # No cycles and edges == n-1 => connected as well => valid tree\n        return True",
+      "explanation": "NA",
+      "time_complexity": "Initialization: O(n) Union/Find over all edges: O(e \u00b7 \u03b1(n)) = O( n + e )",
+      "space_complexity": "O(n)"
+    },
     {
       "title": "Number of Provinces",
       "difficulty": "Medium",
