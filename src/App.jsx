@@ -5,14 +5,22 @@ import { FaMagnifyingGlass } from "react-icons/fa6";
 import CategoryList from './components/CategoryList.jsx';
 import FlashCardGame from './components/FlashCardGame.jsx';
 import SearchResults from './components/SearchResults.jsx';
+import LLDProjects from './components/LLDProjects.jsx';
+import loadLldProjects from './data/lldLoader.js';
+import staticLlds from './data/llds.js';
 import companyData from './data/companies.json';
 import patternQuestions from './data/patterns.json';
 
 const App = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [categoryType, setCategoryType] = useState(null); // 'company', 'pattern', or 'search'
+  const [categoryType, setCategoryType] = useState(null); // 'company', 'pattern', 'search', or 'lld'
   const [searchQuery, setSearchQuery] = useState('');
   const { colorMode, toggleColorMode } = useColorMode();
+  // Load dynamic LLD projects (from actual folders). Fallback to static if none.
+  const lldProjects = useMemo(() => {
+    const loaded = loadLldProjects();
+    return Object.keys(loaded).length ? loaded : staticLlds;
+  }, []);
 
   const companies = [
     { name: 'Amazon', icon: 'FaAmazon', questions: companyData.Amazon || [] },
@@ -102,7 +110,15 @@ const App = () => {
         <Text textAlign="center" color={{ base: 'gray.600', _dark: 'gray.300' }}>
           Test your coding skills with company-specific or pattern-based algorithmic challenges
         </Text>
-        {selectedCategory ? (
+        {categoryType === 'lld' ? (
+          <LLDProjects
+            projects={lldProjects}
+            onBack={() => {
+              setCategoryType(null);
+              setSelectedCategory(null);
+            }}
+          />
+        ) : selectedCategory ? (
           <FlashCardGame
             company={categoryType === 'company' ? selectedCategory : undefined}
             pattern={categoryType === 'pattern' ? selectedCategory : undefined}
@@ -131,6 +147,19 @@ const App = () => {
               categories={patterns}
               onSelect={name => handleSelect(name, 'pattern')}
             />
+            <Box>
+              <Button
+                variant="outline"
+                width="100%"
+                onClick={() => {
+                  setCategoryType('lld');
+                  setSelectedCategory('LLD');
+                }}
+                aria-label="View Low Level Design Projects"
+              >
+                Low Level Designs (LLD)
+              </Button>
+            </Box>
             <Box
               p={4}
               borderWidth="1px"
