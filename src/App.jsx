@@ -8,6 +8,8 @@ import SearchResults from './components/SearchResults.jsx';
 import LLDProjects from './components/LLDProjects.jsx';
 import loadLldProjects from './data/lldLoader.js';
 import staticLlds from './data/llds.js';
+import HLDProjects from './components/HLDProjects.jsx';
+import loadHldImages from './data/hldLoader.js';
 import companyData from './data/companies.json';
 import patternQuestions from './data/patterns.json';
 
@@ -21,6 +23,9 @@ const App = () => {
     const loaded = loadLldProjects();
     return Object.keys(loaded).length ? loaded : staticLlds;
   }, []);
+
+  // Load HLD images
+  const hldProjects = useMemo(() => loadHldImages(), []);
 
   const companies = [
     { name: 'Amazon', icon: 'FaAmazon', questions: companyData.Amazon || [] },
@@ -110,7 +115,15 @@ const App = () => {
         <Text textAlign="center" color={{ base: 'gray.600', _dark: 'gray.300' }}>
           Test your coding skills with company-specific or pattern-based algorithmic challenges
         </Text>
-        {categoryType === 'lld' ? (
+        {categoryType === 'hld' ? (
+          <HLDProjects
+            hlds={hldProjects}
+            onBack={() => {
+              setCategoryType(null);
+              setSelectedCategory(null);
+            }}
+          />
+        ) : categoryType === 'lld' ? (
           <LLDProjects
             projects={lldProjects}
             onBack={() => {
@@ -147,7 +160,7 @@ const App = () => {
               categories={patterns}
               onSelect={name => handleSelect(name, 'pattern')}
             />
-            <Box>
+            <HStack spacing={4} flexWrap="wrap">
               <Button
                 variant="outline"
                 width="100%"
@@ -159,7 +172,18 @@ const App = () => {
               >
                 Low Level Designs (LLD)
               </Button>
-            </Box>
+              <Button
+                variant="outline"
+                width="100%"
+                onClick={() => {
+                  setCategoryType('hld');
+                  setSelectedCategory('HLD');
+                }}
+                aria-label="View High Level Design Projects"
+              >
+                High Level Designs (HLD)
+              </Button>
+            </HStack>
             <Box
               p={4}
               borderWidth="1px"
