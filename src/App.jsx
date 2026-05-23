@@ -132,10 +132,8 @@ const App = () => {
                       onClick={() => handleSelect(c.name, 'company')}
                     >
                       <span className="cat-icon"><Icon /></span>
-                      <span>
-                        <div className="cat-name">{c.name}</div>
-                        <div className="cat-count">{c.questions.length} questions</div>
-                      </span>
+                      <div className="cat-name">{c.name}</div>
+                      <div className="cat-count">{c.questions.length} questions</div>
                     </button>
                   );
                 })}
@@ -160,10 +158,8 @@ const App = () => {
                       onClick={() => handleSelect(p.name, 'pattern')}
                     >
                       <span className="cat-icon"><Icon /></span>
-                      <span>
-                        <div className="cat-name">{p.name}</div>
-                        <div className="cat-count">{p.questions.length} questions</div>
-                      </span>
+                      <div className="cat-name">{p.name}</div>
+                      <div className="cat-count">{p.questions.length} questions</div>
                     </button>
                   );
                 })}
