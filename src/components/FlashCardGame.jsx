@@ -169,44 +169,32 @@ function DeckMeta({ index, total, solvedSet }) {
   const showDots = total <= DOT_LIMIT;
 
   return (
-    <div className="ld-deck-meta">
+    <div className={`ld-deck-meta${showDots ? ' show-dots' : ''}`}>
       <div>
         Card{' '}
         <span className="n">{String(index + 1).padStart(2, '0')}</span>
         {' '}/ {String(total).padStart(2, '0')}
       </div>
 
-      {showDots ? (
+      {showDots && (
         <div className="ld-dots">
           {Array.from({ length: total }).map((_, i) => {
             let cls = 'ld-dot';
-            if (i === index)          cls += ' current';
+            if (i === index)           cls += ' current';
             else if (solvedSet.has(i)) cls += ' done';
             return <span key={i} className={cls} />;
           })}
         </div>
-      ) : (
-        /* Compact progress bar for large decks */
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
-            width: 160, height: 4, background: 'var(--line-2)',
-            borderRadius: 2, overflow: 'hidden', flexShrink: 0,
-          }}>
-            <div style={{
-              width: `${((index + 1) / total) * 100}%`,
-              height: '100%',
-              background: 'var(--syn-amber)',
-              borderRadius: 2,
-              transition: 'width var(--dur-2) var(--ease-out)',
-            }} />
-          </div>
-          {solvedSet.size > 0 && (
-            <span style={{ fontSize: 11, color: 'var(--syn-green)', fontFamily: 'var(--font-mono)' }}>
-              {solvedSet.size} solved
-            </span>
-          )}
-        </div>
       )}
+
+      <div className="ld-progress-bar">
+        <div className="ld-progress-track">
+          <div className="ld-progress-fill" style={{ width: `${((index + 1) / total) * 100}%` }} />
+        </div>
+        {solvedSet.size > 0 && (
+          <span className="ld-progress-solved">{solvedSet.size} solved</span>
+        )}
+      </div>
     </div>
   );
 }
