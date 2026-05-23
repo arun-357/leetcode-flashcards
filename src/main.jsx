@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom/client';
 import { ChakraProvider, extendTheme, ColorModeScript } from '@chakra-ui/react';
-import App from './App.jsx';
-import './styles/leetdeck.css';
+import App from './App/index.jsx';
+import { GlobalStyles } from './styles/GlobalStyles.jsx';
 
 const theme = extendTheme({
   config: {
@@ -45,6 +45,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <>
     <ColorModeScript initialColorMode={theme.config.initialColorMode} />
     <ChakraProvider theme={theme}>
+      <GlobalStyles />
       <App />
     </ChakraProvider>
   </>
