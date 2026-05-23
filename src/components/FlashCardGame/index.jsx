@@ -1,23 +1,44 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
+import { t } from '../../styles/theme.js';
+import {
+  Root, FilterBar, FilterLabel, FilterChipsRow, FilterDot, FilterChip,
+  Stage, DeckMeta, Dots, Dot, ProgressBar, ProgressTrack, ProgressFill, ProgressSolved,
+  CardWrap, CardFace,
+  FaceFront, FrontTop, Eyebrow, FrontTitle, FrontUrl, FrontFoot, RevealHint,
+  FaceBack, BackHead, BackTitleRow, BackTitle, BackNum,
+  BackSection, RowLabel, RowCats,
+  ComplexityBox, CxLabel, CxVal,
+  BackFoot,
+  CodeBlockContainer, CodeBlockCopyBtn, CodeBlockScroll, CodeBlockGutter, CodeBlockLn, CodeBlockPre,
+  Chip,
+  Btn,
+  Controls, ControlsCenter,
+  SolvedBadge,
+  KbdStrip, KbdKey,
+  SearchScrim, SearchBox, SearchInputRow, SearchResultsList, SearchResult, SearchEmpty,
+  Setup, SetupContext, SetupHeading, SetupRow, SetupInput, SetupError,
+  NoQuestionsText,
+} from './styles.js';
+import { Header, HeaderLogo, HeaderPath, HeaderSpacer, HeaderActions } from '../../styles/shared.styles.js';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
-function catClass(name) {
+function catColor(name) {
   const k = name.toLowerCase();
-  if (k.includes('array') || k.includes('two pointer') || k.includes('sliding'))  return 'c-arrays';
-  if (k.includes('hash') || k.includes('map'))   return 'c-hash';
-  if (k.includes('stack'))                        return 'c-stack';
-  if (k.includes('string'))                       return 'c-string';
-  if (k.includes('linked'))                       return 'c-linked';
-  if (k.includes('recursion'))                    return 'c-recursion';
-  if (k.includes('dynamic') || k === 'dp' || k.includes(' dp')) return 'c-dp';
-  if (k.includes('sort') || k.includes('interval')) return 'c-sorting';
-  if (k.includes('graph') || k.includes('network')) return 'c-graph';
-  if (k.includes('dfs') || k.includes('bfs') || k.includes('tree') || k.includes('binary search')) return 'c-dfs';
-  if (k.includes('topo'))  return 'c-topo';
-  if (k.includes('heap') || k.includes('priority')) return 'c-heap';
-  if (k.includes('design')) return 'c-design';
-  return '';
+  if (k.includes('array') || k.includes('two pointer') || k.includes('sliding'))  return t.colors.synCyan;
+  if (k.includes('hash') || k.includes('map'))    return t.colors.synPurple;
+  if (k.includes('stack'))                         return t.colors.synAmber;
+  if (k.includes('string'))                        return t.colors.synPink;
+  if (k.includes('linked'))                        return t.colors.synCyan;
+  if (k.includes('recursion'))                     return t.colors.synPurple;
+  if (k.includes('dynamic') || k === 'dp' || k.includes(' dp')) return t.colors.synGreen;
+  if (k.includes('sort') || k.includes('interval'))  return t.colors.synYellow;
+  if (k.includes('graph') || k.includes('network'))  return t.colors.synPink;
+  if (k.includes('dfs') || k.includes('bfs') || k.includes('tree') || k.includes('binary search')) return t.colors.synCyan;
+  if (k.includes('topo'))   return t.colors.synAmber;
+  if (k.includes('heap') || k.includes('priority')) return t.colors.synGreen;
+  if (k.includes('design')) return t.colors.synPurple;
+  return null;
 }
 
 function parseCategories(category) {
@@ -35,14 +56,14 @@ function normalizeDifficulty(d) {
   return null;
 }
 
-function diffChipClass(normalised) {
-  if (normalised === 'Easy')   return 'ld-chip-easy';
-  if (normalised === 'Medium') return 'ld-chip-medium';
-  if (normalised === 'Hard')   return 'ld-chip-hard';
-  return 'ld-chip-cat';
+function diffChipVariant(normalised) {
+  if (normalised === 'Easy')   return 'easy';
+  if (normalised === 'Medium') return 'medium';
+  if (normalised === 'Hard')   return 'hard';
+  return 'cat';
 }
 
-function FilterBar({ difficulty, setDifficulty, counts }) {
+function FilterBarComponent({ difficulty, setDifficulty, counts }) {
   const items = [
     { key: 'all',    label: `All (${counts.all})`,       cls: 'all'    },
     { key: 'Easy',   label: `Easy (${counts.Easy})`,     cls: 'easy'   },
@@ -50,40 +71,24 @@ function FilterBar({ difficulty, setDifficulty, counts }) {
     { key: 'Hard',   label: `Hard (${counts.Hard})`,     cls: 'hard'   },
   ];
   return (
-    <div className="ld-filter-bar">
-      <span className="ld-filter-label">DIFFICULTY</span>
-      <div style={{ display: 'flex', gap: 6 }}>
+    <FilterBar>
+      <FilterLabel>DIFFICULTY</FilterLabel>
+      <FilterChipsRow>
         {items.map(it => (
-          <button
+          <FilterChip
             key={it.key}
-            className={`ld-fchip ${difficulty === it.key ? `active ${it.cls}` : ''}`}
+            $active={difficulty === it.key}
+            $variant={it.cls}
             onClick={() => setDifficulty(it.key)}
           >
-            {it.key !== 'all' && (
-              <span style={{ width: 6, height: 6, borderRadius: 999, background: 'currentColor', flexShrink: 0 }} />
-            )}
+            {it.key !== 'all' && <FilterDot />}
             {it.label}
-          </button>
+          </FilterChip>
         ))}
-      </div>
-    </div>
+      </FilterChipsRow>
+    </FilterBar>
   );
 }
-
-const KBD = ({ children }) => (
-  <kbd style={{
-    border: '1px solid var(--line-2)',
-    background: 'var(--bg-inset)',
-    padding: '1px 5px',
-    borderRadius: 3,
-    color: 'var(--fg-1)',
-    fontFamily: 'var(--font-mono)',
-    fontSize: 11,
-    marginRight: 5,
-  }}>
-    {children}
-  </kbd>
-);
 
 // ── Python syntax highlighter ─────────────────────────────────────────────────
 
@@ -109,20 +114,20 @@ function highlightPython(src) {
   let out = '', last = 0, prev = '', m;
   while ((m = re.exec(src)) !== null) {
     out += escapeHTML(src.slice(last, m.index));
-    const t = m[0];
+    const tok = m[0];
     let cls = '';
-    if (t.startsWith('#'))              cls = 'tk-comment';
-    else if (t.startsWith('"') || t.startsWith("'")) cls = 'tk-string';
-    else if (/^\d/.test(t))            cls = 'tk-number';
-    else if (t === '->')               cls = 'tk-arrow';
-    else if (PY_KEYWORDS.has(t))       cls = 'tk-keyword';
-    else if (PY_BUILTINS.has(t))       cls = 'tk-builtin';
-    else if (/^[A-Za-z_]/.test(t) && prev === 'def')   cls = 'tk-funcname';
-    else if (/^[A-Za-z_]/.test(t) && prev === 'class') cls = 'tk-classname';
-    if (cls) out += `<span class="${cls}">${escapeHTML(t === '->' ? '→' : t)}</span>`;
-    else out += escapeHTML(t);
-    if (/^[A-Za-z_]/.test(t) || t === 'def' || t === 'class') prev = t;
-    last = m.index + t.length;
+    if (tok.startsWith('#'))              cls = 'tk-comment';
+    else if (tok.startsWith('"') || tok.startsWith("'")) cls = 'tk-string';
+    else if (/^\d/.test(tok))            cls = 'tk-number';
+    else if (tok === '->')               cls = 'tk-arrow';
+    else if (PY_KEYWORDS.has(tok))       cls = 'tk-keyword';
+    else if (PY_BUILTINS.has(tok))       cls = 'tk-builtin';
+    else if (/^[A-Za-z_]/.test(tok) && prev === 'def')   cls = 'tk-funcname';
+    else if (/^[A-Za-z_]/.test(tok) && prev === 'class') cls = 'tk-classname';
+    if (cls) out += `<span class="${cls}">${escapeHTML(tok === '->' ? '→' : tok)}</span>`;
+    else out += escapeHTML(tok);
+    if (/^[A-Za-z_]/.test(tok) || tok === 'def' || tok === 'class') prev = tok;
+    last = m.index + tok.length;
   }
   return out + escapeHTML(src.slice(last));
 }
@@ -141,23 +146,24 @@ function CodeBlock({ source }) {
   }
 
   return (
-    <div className="ld-codeblock" onClick={e => e.stopPropagation()}>
-      <button className="ld-codeblock-copy" onClick={copy} aria-label="Copy code" title={copied ? 'Copied' : 'Copy'}>
+    // className="ld-codeblock" scopes .tk-* rules from GlobalStyles (dangerouslySetInnerHTML spans)
+    <CodeBlockContainer className="ld-codeblock" onClick={e => e.stopPropagation()}>
+      <CodeBlockCopyBtn onClick={copy} aria-label="Copy code" title={copied ? 'Copied' : 'Copy'}>
         {copied ? (
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
         ) : (
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
         )}
-      </button>
-      <div className="ld-codeblock-scroll">
-        <div className="ld-codeblock-gutter" aria-hidden="true">
-          {lines.map((_, i) => <div key={i} className="ld-codeblock-ln">{i + 1}</div>)}
-        </div>
-        <pre className="ld-codeblock-pre">
+      </CodeBlockCopyBtn>
+      <CodeBlockScroll>
+        <CodeBlockGutter aria-hidden="true">
+          {lines.map((_, i) => <CodeBlockLn key={i}>{i + 1}</CodeBlockLn>)}
+        </CodeBlockGutter>
+        <CodeBlockPre>
           <code dangerouslySetInnerHTML={{ __html: highlightPython(lines.join('\n')) }} />
-        </pre>
-      </div>
-    </div>
+        </CodeBlockPre>
+      </CodeBlockScroll>
+    </CodeBlockContainer>
   );
 }
 
@@ -165,11 +171,11 @@ function CodeBlock({ source }) {
 
 const DOT_LIMIT = 20;
 
-function DeckMeta({ index, total, solvedSet }) {
+function DeckMetaComponent({ index, total, solvedSet }) {
   const showDots = total <= DOT_LIMIT;
 
   return (
-    <div className={`ld-deck-meta${showDots ? ' show-dots' : ''}`}>
+    <DeckMeta>
       <div>
         Card{' '}
         <span className="n">{String(index + 1).padStart(2, '0')}</span>
@@ -177,52 +183,52 @@ function DeckMeta({ index, total, solvedSet }) {
       </div>
 
       {showDots && (
-        <div className="ld-dots">
-          {Array.from({ length: total }).map((_, i) => {
-            let cls = 'ld-dot';
-            if (i === index)           cls += ' current';
-            else if (solvedSet.has(i)) cls += ' done';
-            return <span key={i} className={cls} />;
-          })}
-        </div>
+        <Dots>
+          {Array.from({ length: total }).map((_, i) => (
+            <Dot
+              key={i}
+              $state={i === index ? 'current' : solvedSet.has(i) ? 'done' : 'default'}
+            />
+          ))}
+        </Dots>
       )}
 
-      <div className="ld-progress-bar">
-        <div className="ld-progress-track">
-          <div className="ld-progress-fill" style={{ width: `${((index + 1) / total) * 100}%` }} />
-        </div>
+      <ProgressBar $showDots={showDots}>
+        <ProgressTrack>
+          <ProgressFill $width={`${((index + 1) / total) * 100}%`} />
+        </ProgressTrack>
         {solvedSet.size > 0 && (
-          <span className="ld-progress-solved">{solvedSet.size} solved</span>
+          <ProgressSolved>{solvedSet.size} solved</ProgressSolved>
         )}
-      </div>
-    </div>
+      </ProgressBar>
+    </DeckMeta>
   );
 }
 
 function FrontFace({ question, index, total, solved }) {
   const diff = normalizeDifficulty(question.difficulty);
   return (
-    <div className="ld-face-front">
-      <div className="ld-front-top">
-        <div className="ld-eyebrow">PROBLEM · #{index + 1}</div>
+    <FaceFront>
+      <FrontTop>
+        <Eyebrow>PROBLEM · #{index + 1}</Eyebrow>
         {diff && (
-          <span className={`ld-chip ${diffChipClass(diff)}`}>
+          <Chip $variant={diffChipVariant(diff)}>
             <span className="dot" />{diff}
-          </span>
+          </Chip>
         )}
-      </div>
-      <div className="ld-front-title">{question.title}</div>
+      </FrontTop>
+      <FrontTitle>{question.title}</FrontTitle>
       {question.slug && (
-        <div className="ld-front-url">leetcode.com/problems/{question.slug}</div>
+        <FrontUrl>leetcode.com/problems/{question.slug}</FrontUrl>
       )}
-      <div className="ld-front-foot">
+      <FrontFoot>
         <span>Card {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
-        <span className="ld-reveal-hint">
-          {solved && <span className="ld-solved-badge">SOLVED</span>}
-          <span><KBD>space</KBD>reveal</span>
-        </span>
-      </div>
-    </div>
+        <RevealHint>
+          {solved && <SolvedBadge>SOLVED</SolvedBadge>}
+          <span><KbdKey>space</KbdKey>reveal</span>
+        </RevealHint>
+      </FrontFoot>
+    </FaceFront>
   );
 }
 
@@ -230,116 +236,125 @@ function BackFace({ question, index, total }) {
   const diff       = normalizeDifficulty(question.difficulty);
   const categories = parseCategories(question.category);
   return (
-    <div className="ld-face-back">
-      <div className="ld-back-head">
-        <div className="ld-back-title-row">
-          <h2 className="ld-back-title">{question.title}</h2>
+    <FaceBack>
+      <BackHead>
+        <BackTitleRow>
+          <BackTitle>{question.title}</BackTitle>
           {diff && (
-            <span className={`ld-chip ${diffChipClass(diff)}`}>
+            <Chip $variant={diffChipVariant(diff)}>
               <span className="dot" />{diff}
-            </span>
+            </Chip>
           )}
-        </div>
-        <span className="ld-back-num">#{index + 1}</span>
-      </div>
+        </BackTitleRow>
+        <BackNum>#{index + 1}</BackNum>
+      </BackHead>
 
       {categories.length > 0 && (
-        <div className="ld-back-section">
-          <div className="ld-row-label">CATEGORY</div>
-          <div className="ld-row-cats">
-            {categories.map(c => (
-              <span key={c} className={`ld-chip ld-chip-cat ${catClass(c)}`}>{c}</span>
-            ))}
-          </div>
-        </div>
+        <BackSection>
+          <RowLabel>CATEGORY</RowLabel>
+          <RowCats>
+            {categories.map(c => {
+              const color = catColor(c);
+              return (
+                <Chip
+                  key={c}
+                  $variant="cat"
+                  style={color ? { color } : undefined}
+                >
+                  {c}
+                </Chip>
+              );
+            })}
+          </RowCats>
+        </BackSection>
       )}
 
-      <div className="ld-back-section">
-        <div className="ld-row-label">SOLUTION</div>
+      <BackSection>
+        <RowLabel>SOLUTION</RowLabel>
         <CodeBlock source={question.solution || '# No solution available'} />
-      </div>
+      </BackSection>
 
-      <div className="ld-back-section">
-        <div className="ld-complexity-box">
+      <BackSection>
+        <ComplexityBox>
           <div>
-            <div className="ld-cx-label">TIME</div>
-            <div className="ld-cx-val time">{question.time_complexity || '—'}</div>
+            <CxLabel>TIME</CxLabel>
+            <CxVal $kind="time">{question.time_complexity || '—'}</CxVal>
           </div>
           <div>
-            <div className="ld-cx-label">SPACE</div>
-            <div className="ld-cx-val space">{question.space_complexity || '—'}</div>
+            <CxLabel>SPACE</CxLabel>
+            <CxVal $kind="space">{question.space_complexity || '—'}</CxVal>
           </div>
-        </div>
-      </div>
+        </ComplexityBox>
+      </BackSection>
 
-      <div className="ld-back-foot">
+      <BackFoot>
         <span>Card {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
-        <span><KBD>space</KBD>back to front</span>
-      </div>
-    </div>
+        <span><KbdKey>space</KbdKey>back to front</span>
+      </BackFoot>
+    </FaceBack>
   );
 }
 
 function FlashcardFace({ question, index, total, flipped, onFlip, solved }) {
   return (
-    <div className="ld-card-wrap">
-      <div
-        className={`ld-card-face ${flipped ? 'is-back' : 'is-front'}`}
+    <CardWrap>
+      <CardFace
+        $flipped={flipped}
+        key={flipped ? 'back' : 'front'}
         onClick={onFlip}
         role="button"
         tabIndex={0}
         aria-label={flipped ? 'Click to show front' : 'Click to reveal solution'}
         onKeyDown={e => (e.key === ' ' || e.key === 'Enter') && onFlip()}
-        key={flipped ? 'back' : 'front'}
       >
         {flipped
           ? <BackFace question={question} index={index} total={total} />
           : <FrontFace question={question} index={index} total={total} solved={solved} />
         }
-      </div>
-    </div>
+      </CardFace>
+    </CardWrap>
   );
 }
 
 function DeckControls({ onPrev, onNext, onShuffle, onMarkSolved, atStart, atEnd, solved }) {
   return (
-    <div className="ld-controls">
-      <button className="ld-btn" onClick={onPrev} disabled={atStart} aria-label="Previous card">
+    <Controls>
+      <Btn onClick={onPrev} disabled={atStart} aria-label="Previous card">
         ← Prev
-      </button>
-      <div className="ld-controls-center">
-        <button className="ld-btn" onClick={onShuffle} aria-label="Shuffle deck">
+      </Btn>
+      <ControlsCenter>
+        <Btn onClick={onShuffle} aria-label="Shuffle deck">
           Shuffle <span className="ld-kbd-hint">S</span>
-        </button>
-        <button
-          className={`ld-btn ${solved ? '' : 'ld-btn-primary'}`}
+        </Btn>
+        <Btn
+          $primary={!solved}
           onClick={onMarkSolved}
           aria-label={solved ? 'Unmark solved' : 'Mark as solved'}
         >
           {solved ? 'Unmark' : 'Mark Solved'}{' '}
           <span className="ld-kbd-hint">M</span>
-        </button>
-      </div>
-      <button className="ld-btn ld-btn-primary" onClick={onNext} disabled={atEnd} aria-label="Next card">
+        </Btn>
+      </ControlsCenter>
+      <Btn $primary onClick={onNext} disabled={atEnd} aria-label="Next card">
         Next →
-      </button>
-    </div>
+      </Btn>
+    </Controls>
   );
 }
 
 function KeyboardHints({ solvedCount, total }) {
   return (
-    <div className="ld-kbd-strip">
-      <span className="item"><KBD>←</KBD><KBD>→</KBD> navigate</span>
-      <span className="item"><KBD>space</KBD> flip</span>
-      <span className="item"><KBD>S</KBD> shuffle</span>
-      <span className="item"><KBD>M</KBD> mark solved</span>
-      <span className="item"><KBD>/</KBD> search</span>
+    <KbdStrip>
+      <span className="item"><KbdKey>←</KbdKey><KbdKey>→</KbdKey> navigate</span>
+      <span className="item"><KbdKey>space</KbdKey> flip</span>
+      <span className="item"><KbdKey>S</KbdKey> shuffle</span>
+      <span className="item"><KbdKey>M</KbdKey> mark solved</span>
+      <span className="item"><KbdKey>/</KbdKey> search</span>
       <span className="spacer" />
       <span className="status">
         <span className="ok">●</span> {solvedCount} / {total} solved
       </span>
-    </div>
+    </KbdStrip>
   );
 }
 
@@ -368,12 +383,10 @@ function SearchPalette({ questions, onPick, onClose }) {
     else if (e.key === 'Escape')    { e.preventDefault(); onClose(); }
   }
 
-  const escStyle = { border: '1px solid var(--line-2)', background: 'var(--bg-inset)', padding: '1px 5px', borderRadius: 3, color: 'var(--fg-1)', fontFamily: 'var(--font-mono)', fontSize: 11 };
-
   return (
-    <div className="ld-search-scrim ld-fade-in" onClick={onClose}>
-      <div className="ld-search-box" onClick={e => e.stopPropagation()}>
-        <div className="ld-search-input-row">
+    <SearchScrim onClick={onClose}>
+      <SearchBox onClick={e => e.stopPropagation()}>
+        <SearchInputRow>
           <span className="pre">&gt;</span>
           <input
             ref={inputRef}
@@ -383,16 +396,16 @@ function SearchPalette({ questions, onPick, onClose }) {
             placeholder="search by title or category…"
             autoComplete="off"
           />
-          <kbd style={escStyle}>esc</kbd>
-        </div>
-        <div className="ld-search-results">
+          <KbdKey>esc</KbdKey>
+        </SearchInputRow>
+        <SearchResultsList>
           {results.length === 0 ? (
-            <div className="ld-search-empty">No matches.</div>
+            <SearchEmpty>No matches.</SearchEmpty>
           ) : (
             results.map((r, i) => (
-              <div
+              <SearchResult
                 key={r.slug || r.title}
-                className={`ld-search-result${i === sel ? ' sel' : ''}`}
+                $sel={i === sel}
                 onMouseEnter={() => setSel(i)}
                 onClick={() => onPick(r)}
               >
@@ -400,12 +413,12 @@ function SearchPalette({ questions, onPick, onClose }) {
                   <span className="sr-title">{r.title}</span>
                   <span className="sr-cat">{r.category}</span>
                 </div>
-              </div>
+              </SearchResult>
             ))
           )}
-        </div>
-      </div>
-    </div>
+        </SearchResultsList>
+      </SearchBox>
+    </SearchScrim>
   );
 }
 
@@ -423,12 +436,11 @@ function SetupScreen({ company, questions, onStart }) {
   }
 
   return (
-    <div className="ld-setup">
-      <div className="ld-setup-context">{company} · {questions.length} questions available</div>
-      <div className="ld-setup-heading">How many cards?</div>
-      <div className="ld-setup-row">
-        <input
-          className="ld-setup-input"
+    <Setup>
+      <SetupContext>{company} · {questions.length} questions available</SetupContext>
+      <SetupHeading>How many cards?</SetupHeading>
+      <SetupRow>
+        <SetupInput
           type="number"
           min={1}
           max={questions.length}
@@ -438,12 +450,12 @@ function SetupScreen({ company, questions, onStart }) {
           placeholder={`1 – ${questions.length}`}
           autoFocus
         />
-        <button className="ld-btn ld-btn-primary" onClick={handleStart} disabled={!num}>
+        <Btn $primary onClick={handleStart} disabled={!num}>
           Start
-        </button>
-      </div>
-      {err && <div className="ld-setup-error">{err}</div>}
-    </div>
+        </Btn>
+      </SetupRow>
+      {err && <SetupError>{err}</SetupError>}
+    </Setup>
   );
 }
 
@@ -544,19 +556,16 @@ const FlashCardGame = ({ company, pattern, categoryType, questions, onBack }) =>
   const current      = deck[index];
 
   return (
-    <div className="ld-root" style={{
-      position: 'fixed', inset: 0, background: 'var(--bg-0)', zIndex: 100,
-      display: 'flex', flexDirection: 'column', overflowY: 'auto',
-    }}>
+    <Root>
       {/* Header */}
-      <header className="ld-hdr">
-        <button className="ld-btn ld-btn-ghost" onClick={onBack} style={{ padding: '0 10px', minWidth: 'auto' }}>
+      <Header>
+        <Btn $ghost $compact onClick={onBack}>
           ← back
-        </button>
-        <div className="ld-hdr-logo">
+        </Btn>
+        <HeaderLogo>
           <span className="prompt">&gt;</span>leetdeck
-        </div>
-        <div className="ld-hdr-path">
+        </HeaderLogo>
+        <HeaderPath>
           <span className="seg">~/decks</span>
           <span className="sep">/</span>
           <span className="seg">{deckFileName}</span>
@@ -566,31 +575,31 @@ const FlashCardGame = ({ company, pattern, categoryType, questions, onBack }) =>
               <span>{String(deck.length).padStart(2, '0')} cards</span>
             </>
           )}
-        </div>
-        <div className="ld-hdr-spacer" />
+        </HeaderPath>
+        <HeaderSpacer />
         {setupDone && !isSingle && (
-          <div className="ld-hdr-actions">
-            <button className="ld-btn ld-btn-ghost" onClick={() => setSearchOpen(true)}>
+          <HeaderActions>
+            <Btn $ghost onClick={() => setSearchOpen(true)}>
               Search <span className="ld-kbd-hint">/</span>
-            </button>
-          </div>
+            </Btn>
+          </HeaderActions>
         )}
-      </header>
+      </Header>
 
       {/* Difficulty filter bar */}
       {!isSingle && (
-        <FilterBar difficulty={difficulty} setDifficulty={setDifficulty} counts={counts} />
+        <FilterBarComponent difficulty={difficulty} setDifficulty={setDifficulty} counts={counts} />
       )}
 
       {/* Stage */}
-      <div className="ld-stage">
+      <Stage>
         {!setupDone ? (
           <SetupScreen company={company} questions={filteredBase} onStart={handleSetupStart} />
         ) : !current ? (
-          <div style={{ color: 'var(--fg-3)', fontFamily: 'var(--font-mono)' }}>No questions available.</div>
+          <NoQuestionsText>No questions available.</NoQuestionsText>
         ) : (
           <>
-            {!isSingle && <DeckMeta index={index} total={deck.length} solvedSet={solvedSet} />}
+            {!isSingle && <DeckMetaComponent index={index} total={deck.length} solvedSet={solvedSet} />}
             <FlashcardFace
               question={current}
               index={index}
@@ -612,7 +621,7 @@ const FlashCardGame = ({ company, pattern, categoryType, questions, onBack }) =>
             )}
           </>
         )}
-      </div>
+      </Stage>
 
       {/* Fixed keyboard hints */}
       {setupDone && !isSingle && (
@@ -627,7 +636,7 @@ const FlashCardGame = ({ company, pattern, categoryType, questions, onBack }) =>
           onClose={() => setSearchOpen(false)}
         />
       )}
-    </div>
+    </Root>
   );
 };
 

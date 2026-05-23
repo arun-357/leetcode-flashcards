@@ -3,12 +3,20 @@ import { Collapse } from '@chakra-ui/react';
 import {
   FaAmazon, FaMicrosoft, FaFacebook, FaGoogle, FaNewspaper, FaApple, FaCodeBranch,
 } from 'react-icons/fa';
-import FlashCardGame from './components/FlashCardGame.jsx';
-import LLDProjects from './components/LLDProjects.jsx';
-import loadLldProjects from './data/lldLoader.js';
-import staticLlds from './data/llds.js';
-import companyData from './data/companies.json';
-import patternQuestions from './data/patterns.json';
+import FlashCardGame from '../components/FlashCardGame/index.jsx';
+import LLDProjects from '../components/LLDProjects.jsx';
+import loadLldProjects from '../data/lldLoader.js';
+import staticLlds from '../data/llds.js';
+import companyData from '../data/companies.json';
+import patternQuestions from '../data/patterns.json';
+import { Header, HeaderLogo, HeaderPath, HeaderSpacer } from '../styles/shared.styles.js';
+import {
+  NavShell, NavContent, LldContainer,
+  CatSection, CatToggle, ToggleChevron, CatGrid, CatItem,
+  LldBtn,
+  NavSearch, NavSearchInputRow, NavSearchResults,
+  NavSearchResult, NavSearchResultMeta, NoResults,
+} from './styles.js';
 
 const COMPANY_ICONS = { Amazon: FaAmazon, Microsoft: FaMicrosoft, Meta: FaFacebook, Google: FaGoogle, Bloomberg: FaNewspaper, Apple: FaApple };
 
@@ -91,94 +99,91 @@ const App = () => {
   }
 
   return (
-    <div className="ld-nav-shell">
+    <NavShell>
       {/* Terminal header */}
-      <header className="ld-hdr">
-        <div className="ld-hdr-logo">
+      <Header>
+        <HeaderLogo>
           <span className="prompt">&gt;</span>leetdeck
-        </div>
-        <div className="ld-hdr-path">
+        </HeaderLogo>
+        <HeaderPath>
           <span className="seg">~/decks</span>
           <span className="sep">/</span>
           <span className="seg">{categoryType === 'lld' ? 'lld' : 'home'}</span>
-        </div>
-        <div className="ld-hdr-spacer" />
-      </header>
+        </HeaderPath>
+        <HeaderSpacer />
+      </Header>
 
       {/* LLD full content */}
       {categoryType === 'lld' ? (
-        <div style={{ padding: '24px 24px 100px', maxWidth: 1100, margin: '0 auto', width: '100%' }}>
+        <LldContainer>
           <LLDProjects
             projects={lldProjects}
             onBack={handleBack}
           />
-        </div>
+        </LldContainer>
       ) : (
-        <div className="ld-nav-content">
+        <NavContent>
           {/* Companies */}
-          <div className="ld-cat-section">
-            <button className="ld-cat-toggle" onClick={() => setCompaniesOpen(o => !o)}>
+          <CatSection>
+            <CatToggle onClick={() => setCompaniesOpen(o => !o)}>
               <span>Companies</span>
-              <span className={`toggle-chevron${companiesOpen ? ' open' : ''}`}>▾</span>
-            </button>
+              <ToggleChevron $open={companiesOpen}>▾</ToggleChevron>
+            </CatToggle>
             <Collapse in={companiesOpen} animateOpacity>
-              <div className="ld-cat-grid" style={{ paddingTop: 4 }}>
+              <CatGrid>
                 {companies.map(c => {
                   const Icon = c.icon;
                   return (
-                    <button
+                    <CatItem
                       key={c.name}
-                      className="ld-cat-item"
                       onClick={() => handleSelect(c.name, 'company')}
                     >
                       <span className="cat-icon"><Icon /></span>
                       <div className="cat-name">{c.name}</div>
                       <div className="cat-count">{c.questions.length} questions</div>
-                    </button>
+                    </CatItem>
                   );
                 })}
-              </div>
+              </CatGrid>
             </Collapse>
-          </div>
+          </CatSection>
 
           {/* Patterns */}
-          <div className="ld-cat-section">
-            <button className="ld-cat-toggle" onClick={() => setPatternsOpen(o => !o)}>
+          <CatSection>
+            <CatToggle onClick={() => setPatternsOpen(o => !o)}>
               <span>Patterns</span>
-              <span className={`toggle-chevron${patternsOpen ? ' open' : ''}`}>▾</span>
-            </button>
+              <ToggleChevron $open={patternsOpen}>▾</ToggleChevron>
+            </CatToggle>
             <Collapse in={patternsOpen} animateOpacity>
-              <div className="ld-cat-grid" style={{ paddingTop: 4 }}>
+              <CatGrid>
                 {patterns.map(p => {
                   const Icon = p.icon;
                   return (
-                    <button
+                    <CatItem
                       key={p.name}
-                      className="ld-cat-item"
                       onClick={() => handleSelect(p.name, 'pattern')}
                     >
                       <span className="cat-icon"><Icon /></span>
                       <div className="cat-name">{p.name}</div>
                       <div className="cat-count">{p.questions.length} questions</div>
-                    </button>
+                    </CatItem>
                   );
                 })}
-              </div>
+              </CatGrid>
             </Collapse>
-          </div>
+          </CatSection>
 
           {/* LLD */}
-          <button
-            className="ld-lld-btn"
+          <LldBtn
             onClick={() => { setSelectedCategory('LLD'); setCategoryType('lld'); }}
           >
             <span>Low Level Designs (LLD)</span>
             <span className="lld-arrow">→</span>
-          </button>
+          </LldBtn>
 
           {/* Search */}
-          <div className="ld-nav-search">
-            <div className="ld-nav-search-input-row">
+          <NavSearch>
+            <NavSearchInputRow>
               <span className="pre">&gt;</span>
               <input
                 placeholder="search questions by title, category, description…"
@@ -186,35 +191,34 @@ const App = () => {
                 onChange={e => setSearchQuery(e.target.value)}
                 aria-label="Search questions"
               />
-            </div>
+            </NavSearchInputRow>
             {searchQuery && (
-              <div className="ld-nav-search-results">
+              <NavSearchResults>
                 {searchResults.length === 0 ? (
-                  <div className="ld-no-results">No results for "{searchQuery}"</div>
+                  <NoResults>No results for "{searchQuery}"</NoResults>
                 ) : (
                   searchResults.map((r, i) => (
-                    <div
+                    <NavSearchResult
                       key={`${r.source}-${r.title}-${i}`}
-                      className="ld-nav-search-result"
                       onClick={() => handleSearchSelect(r)}
                       role="button"
                       tabIndex={0}
                       onKeyDown={e => e.key === 'Enter' && handleSearchSelect(r)}
                     >
                       <span className="nsr-title">{r.title}</span>
-                      <span className="nsr-meta">{r.category}</span>
-                      <span className="nsr-meta" style={{ color: 'var(--fg-4)' }}>
-                        {r.sourceType === 'company' ? r.source : r.source}
-                      </span>
-                    </div>
+                      <NavSearchResultMeta>{r.category}</NavSearchResultMeta>
+                      <NavSearchResultMeta $dim>
+                        {r.source}
+                      </NavSearchResultMeta>
+                    </NavSearchResult>
                   ))
                 )}
-              </div>
+              </NavSearchResults>
             )}
-          </div>
-        </div>
+          </NavSearch>
+        </NavContent>
       )}
-    </div>
+    </NavShell>
   );
 };
 
