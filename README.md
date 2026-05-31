@@ -2,6 +2,10 @@
 
 A dark, terminal-aesthetic flashcard app for grinding LeetCode. Browse by company or pattern, flip cards to reveal solutions with syntax-highlighted Python, and track your progress.
 
+## Demo
+
+<video src="leetdeck.mp4" controls width="100%"></video>
+
 ## Stack
 
 - **React 18 + Vite** — fast dev server, ESM builds
