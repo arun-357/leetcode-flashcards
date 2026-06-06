@@ -4,7 +4,7 @@ import {
   Root, FilterBar, FilterLabel, FilterChipsRow, FilterDot, FilterChip,
   Stage, DeckMeta, Dots, Dot, ProgressBar, ProgressTrack, ProgressFill, ProgressSolved,
   CardWrap, CardFace,
-  FaceFront, FrontTop, Eyebrow, FrontTitle, FrontUrl, FrontFoot, RevealHint,
+  FaceFront, FrontTop, Eyebrow, FrontTitle, FrontUrl, FrontFoot, RevealHint, DescriptionText,
   FaceBack, BackHead, BackTitleRow, BackTitle, BackNum,
   BackSection, RowLabel, RowCats,
   ComplexityBox, CxLabel, CxVal,
@@ -22,6 +22,16 @@ import {
 import { Header, HeaderLogo, HeaderPath, HeaderSpacer, HeaderActions } from '../../styles/shared.styles.js';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
+
+function normalizeDescription(text) {
+  if (!text) return '';
+  return text
+    .replace(/ /g, ' ')
+    .split('\n\n')
+    .map(para => para.replace(/\n/g, ' ').replace(/  +/g, ' ').trim())
+    .filter(para => para.length > 0)
+    .join('\n\n');
+}
 
 function catColor(name) {
   const k = name.toLowerCase();
@@ -220,6 +230,9 @@ function FrontFace({ question, index, total, solved }) {
       <FrontTitle>{question.title}</FrontTitle>
       {question.slug && (
         <FrontUrl>leetcode.com/problems/{question.slug}</FrontUrl>
+      )}
+      {question.description && (
+        <DescriptionText>{normalizeDescription(question.description)}</DescriptionText>
       )}
       <FrontFoot>
         <span>Card {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>

@@ -288,6 +288,27 @@ export const RevealHint = styled.span`
   gap: ${t.space[2]};
 `;
 
+export const DescriptionText = styled.div`
+  font-size: 0.83rem;
+  line-height: 1.65;
+  color: ${t.colors.fg2};
+  text-align: left;
+  overflow-y: auto;
+  max-height: 240px;
+  padding: 12px 14px;
+  background: ${t.colors.bg2};
+  border-radius: 8px;
+  border: 1px solid ${t.colors.line2};
+  white-space: pre-line;
+  word-break: break-word;
+  margin-top: 14px;
+
+  @media (max-width: 640px) {
+    max-height: 180px;
+    font-size: 0.78rem;
+  }
+`;
+
 // ── Back Face ─────────────────────────────────────────────────────────────────
 
 export const FaceBack = styled.div`
