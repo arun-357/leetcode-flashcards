@@ -3216,6 +3216,18 @@
       "explanation": "N/A",
       "time_complexity": "O(n)",
       "space_complexity": "O(1)"
+    },
+    {
+      "title": "Number of Ways to Paint N × 3 Grid",
+      "difficulty": "HARD",
+      "category": "",
+      "link": "https://leetcode.com/problems/number-of-ways-to-paint-n-3-grid",
+      "slug": "number-of-ways-to-paint-n-3-grid",
+      "description": "You have a grid of size n x 3 and you want to paint each cell of the grid with exactly one of the three colors: Red, Yellow, or Green while making sure that no two adjacent cells have the same color (i.e., no two cells that share vertical or horizontal sides have the same color).\n\nGiven n the number of rows of the grid, return the number of ways you can paint this grid. As the answer may grow large, the answer must be computed modulo 109 + 7.\n",
+      "solution": "def numOfWays(n: int) -> int:\n    \"\"\"\n    Problem: Count valid 3-color paintings of n×3 grid, no adjacent same color.\n    Approach: Row-by-row DP over 12 valid row patterns.\n    Time complexity:  O(n) — outer loop runs n-1 times, inner is constant 12×12\n    Space complexity: O(1) — dp dict always has exactly 12 keys\n    \"\"\"\n    MOD = 10**9 + 7\n\n    # only 12 of 27 possible rows satisfy no horizontal color clash\n    valid_patterns = [\n        (a, b, c)\n        for a in range(3)\n        for b in range(3)\n        for c in range(3)\n        if a != b and b != c\n    ]\n\n    # precompute vertical compatibility — all 3 columns must differ\n    compatible = {p: [] for p in valid_patterns}\n    for p1 in valid_patterns:\n        for p2 in valid_patterns:\n            if p1[0] != p2[0] and p1[1] != p2[1] and p1[2] != p2[2]:\n                compatible[p1].append(p2)\n\n    # base case: one way to paint each valid pattern on row 1\n    dp = {p: 1 for p in valid_patterns}\n\n    for _ in range(n - 1):\n        new_dp = {p: 0 for p in valid_patterns}\n        for curr in valid_patterns:\n            for prev in compatible[curr]:\n                # each prev row that's compatible contributes its count\n                new_dp[curr] = (new_dp[curr] + dp[prev]) % MOD\n        dp = new_dp\n\n    return sum(dp.values()) % MOD\n\n# ================================================================ #\n# KEY DECISION: why precompute compatible pairs?                   #\n#   Compatibility check is the same every row — no need to        #\n#   recompute it n times. Precompute once, reuse n-1 times.       #\n#                                                                  #\n# KEY DECISION: why only 12 patterns?                             #\n#   3 cells, 3 colors, but a≠b and b≠c cuts 27 down to 12.       #\n#   Note: a==c IS allowed (e.g. 0,1,0) — only neighbours clash.  #\n#                                                                  #\n# KEY INSIGHT: why is this O(n) not O(n²)?                        #\n#   Inner loops are always 12×12=144 — a fixed constant.         #\n#   Only the outer row loop scales with n.                        #\n# ================================================================ #\n",
+      "explanation": "N/A",
+      "time_complexity": "O(n)",
+      "space_complexity": "O(1)"
     }
   ],
   "Knapsack DP": [

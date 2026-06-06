@@ -110,6 +110,16 @@ def build_entry():
     }
 
 
+def find_duplicates(slug, datasets):
+    found = []
+    for file_key, (cat, data) in datasets.items():
+        for category, problems in data.items():
+            for p in problems:
+                if p.get("slug", "").strip().lower() == slug.strip().lower():
+                    found.append(f"{file_key}.json → {category}")
+    return found
+
+
 def confirm(entry, targets_with_categories):
     print("\n--- Summary ---")
     print(f"  Title:      {entry['title']} ({entry['difficulty']})")
@@ -136,6 +146,16 @@ def main():
         datasets[file_key] = (cat, data)
 
     entry = build_entry()
+
+    dupes = find_duplicates(entry["slug"], datasets)
+    if dupes:
+        print(f"\n[WARNING] Slug '{entry['slug']}' already exists in:")
+        for loc in dupes:
+            print(f"  • {loc}")
+        answer = input("Add anyway? [y/N]: ").strip().lower()
+        if answer != "y":
+            print("Aborted.")
+            return
 
     if not confirm(entry, targets_with_categories):
         print("Aborted.")
