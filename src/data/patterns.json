@@ -3262,7 +3262,7 @@
       "link": "https://leetcode.com/problems/last-stone-weight-ii",
       "slug": "last-stone-weight-ii",
       "description": "You are given an array of integers \nstones\n where \nstones[i]\n is the weight of the \ni\nth\n stone.\n\n\nWe are playing a game with the stones. On each turn, we choose any two stones and smash them together. Suppose the stones have weights \nx\n and \ny\n with \nx <= y\n. The result of this smash is:\n\n\n\n\nIf \nx == y\n, both stones are destroyed, and\n\n\nIf \nx != y\n, the stone of weight \nx\n is destroyed, and the stone of weight \ny\n has new weight \ny - x\n.\n\n\n\n\nAt the end of the game, there is \nat most one\n stone left.\n\n\nReturn \nthe smallest possible weight of the left stone\n. If there are no stones left, return \n0\n.\n\n\n \n\n\nExample 1:\n\n\n\n\nInput:\n stones = [2,7,4,1,8,1]\n\nOutput:\n 1\n\nExplanation:\n\nWe can combine 2 and 4 to get 2, so the array converts to [2,7,1,8,1] then,\nwe can combine 7 and 8 to get 1, so the array converts to [2,1,1,1] then,\nwe can combine 2 and 1 to get 1, so the array converts to [1,1,1] then,\nwe can combine 1 and 1 to get 0, so the array converts to [1], then that's the optimal value.\n\n\n\nExample 2:\n\n\n\n\nInput:\n stones = [31,26,33,21,40]\n\nOutput:\n 5\n\n\n\n \n\n\nConstraints:\n\n\n\n\n1 <= stones.length <= 30\n\n\n1 <= stones[i] <= 100",
-      "solution": "class Solution(object):\n    def lastStoneWeightII(self, stones):\n        \"\"\"\n        :type stones: List[int]\n        :rtype: int\n        \"\"\"\n        dp = {0}\n        for stone in stones:\n            dp |= {stone+i for i in dp}\n        S = sum(stones)\n        return min(abs(i-(S-i)) for i in dp)",
+      "solution": "class Solution:\n    def lastStoneWeightII(self, stones: List[int]) -> int:\n        total = sum(stones)\n        target = total // 2  # want subset sum as close to this as possible\n\n        # dp = all reachable subset sums seen so far\n        dp = {0}  # sum 0 always reachable (pick nothing)\n\n        for stone in stones:\n            new_dp = set(dp)        # skip this stone — old sums carry over\n            for prev_sum in dp:\n                new_dp.add(prev_sum + stone)  # take this stone\n            dp = new_dp\n\n        # largest reachable sum that doesn't exceed half total\n        best = max(s for s in dp if s <= target)\n\n        # group2=best, group1=total-best → minimise their difference\n        return (total - best) - best\n",
       "explanation": "N/A",
       "time_complexity": "O(2^n)",
       "space_complexity": "O(2^n)"
@@ -3278,6 +3278,30 @@
       "explanation": "N/A",
       "time_complexity": "o(n * target)",
       "space_complexity": "O(target)"
+    },
+    {
+      "title": "Ones and Zeroes",
+      "difficulty": "MEDIUM",
+      "category": "",
+      "link": "https://leetcode.com/problems/ones-and-zeroes",
+      "slug": "ones-and-zeroes",
+      "description": "You are given an array of binary strings strs and two integers m and n.\n\nReturn the size of the largest subset of strs such that there are at most m 0's and n 1's in the subset.\n\nA set x is a subset of a set y if all elements of x are also elements of y.\n\n \n\nExample 1:\n\nInput: strs = [\"10\",\"0001\",\"111001\",\"1\",\"0\"], m = 5, n = 3\nOutput: 4\nExplanation: The largest subset with at most 5 0's and 3 1's is {\"10\", \"0001\", \"1\", \"0\"}, so the answer is 4.\nOther valid but smaller subsets include {\"0001\", \"1\"} and {\"10\", \"1\", \"0\"}.\n{\"111001\"} is an invalid subset because it contains 4 1's, greater than the maximum of 3.",
+      "solution": "class Solution:\n    def findMaxForm(self, strs: List[str], m: int, n: int) -> int:\n\n        # dp[i][j] = max subset size using at most i zeros and j ones\n        # 2D knapsack — two budgets instead of one\n        dp = [[0] * (n + 1) for _ in range(m + 1)]\n\n        for s in strs:\n            zeros = s.count('0')\n            ones  = s.count('1')\n\n            # right to left on BOTH dimensions\n            # ensures each string is used at most once —\n            # dp[i-zeros][j-ones] reads pre-update values from this round\n            for i in range(m, zeros - 1, -1):      # stop at zeros — can't afford below\n                for j in range(n, ones - 1, -1):   # stop at ones  — can't afford below\n\n                    # skip → dp[i][j] unchanged\n                    # take → spend (zeros, ones) budget, gain 1 in subset size\n                    dp[i][j] = max(dp[i][j], dp[i - zeros][j - ones] + 1)\n\n        # max subset size within full budget of m zeros and n ones\n        return dp[m][n]",
+      "explanation": "N/A",
+      "time_complexity": "O(m*n)",
+      "space_complexity": "O(m*n)"
+    },
+    {
+      "title": "Profitable Schemes",
+      "difficulty": "HARD",
+      "category": "",
+      "link": "https://leetcode.com/problems/profitable-schemes",
+      "slug": "profitable-schemes",
+      "description": "There is a group of n members, and a list of various crimes they could commit. The ith crime generates a profit[i] and requires group[i] members to participate in it. If a member participates in one crime, that member can't participate in another crime.\n\nLet's call a profitable scheme any subset of these crimes that generates at least minProfit profit, and the total number of members participating in that subset of crimes is at most n.\n\nReturn the number of schemes that can be chosen. Since the answer may be very large, return it modulo 109 + 7.\n\n \n\nExample 1:\n\nInput: n = 5, minProfit = 3, group = [2,2], profit = [2,3]\nOutput: 2\nExplanation: To make a profit of at least 3, the group could either commit crimes 0 and 1, or just crime 1.\nIn total, there are 2 schemes.",
+      "solution": "class Solution:\n    def profitableSchemes(self, n: int, minProfit: int, group: List[int], profit: List[int]) -> int:\n        MOD = 10**9 + 7\n\n        # dp[i][j] = number of schemes generating profit i using j members\n        # rows = profit levels 0..minProfit\n        # cols = member counts 0..n\n        dp = [[0] * (n + 1) for _ in range(minProfit + 1)]\n\n        # base case — one way to do nothing (0 profit, 0 members)\n        dp[0][0] = 1\n\n        for p, g in zip(profit, group):\n            # right to left on both dims — each crime used at most once\n            # iterate profit from minProfit down to 0\n            for i in range(minProfit, -1, -1):\n                # stop at n-g — writing to j+g must stay within bounds (j+g <= n)\n                for j in range(n - g, -1, -1):\n\n                    # clamp profit at minProfit —\n                    # any profit beyond minProfit is equally valid\n                    # so fold all excess into the minProfit bucket\n                    clamped = min(i + p, minProfit)\n\n                    # dp[i][j]        → schemes with profit i, using j members (before this crime)\n                    # j + g           → members used after taking this crime\n                    # dp[clamped][j+g] → accumulate all paths landing at this (profit, members) state\n                    dp[clamped][j + g] = (dp[clamped][j + g] + dp[i][j]) % MOD\n\n        # sum entire minProfit row —\n        # all member counts (0..n) that achieved profit >= minProfit\n        return sum(dp[minProfit]) % MOD\n",
+      "explanation": "N/A",
+      "time_complexity": "O(len(group) × minProfit × n)",
+      "space_complexity": "O(minProfit × n)"
     }
   ],
   "Unbounded Knapsack DP": [
