@@ -62,7 +62,9 @@ const App = () => {
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return [];
     const re = new RegExp(searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-    return allQuestions.filter(q => re.test(q.title) || re.test(q.description) || re.test(q.category));
+    return allQuestions.filter(q =>
+      re.test(q.title) || re.test(q.description) || re.test(q.category) || re.test(q.source)
+    );
   }, [searchQuery, allQuestions]);
 
   function handleSelect(name, type) {
@@ -186,7 +188,7 @@ const App = () => {
             <NavSearchInputRow>
               <span className="pre">&gt;</span>
               <input
-                placeholder="search questions by title, category, description…"
+                placeholder="search questions by title, pattern, category, description…"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 aria-label="Search questions"

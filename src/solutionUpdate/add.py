@@ -111,13 +111,37 @@ def build_entry():
 
 
 def find_duplicates(slug, datasets):
+    """Scan every known JSON file (not just the chosen targets) so the user
+    learns about collisions even in files they aren't currently writing to."""
     found = []
-    for file_key, (cat, data) in datasets.items():
+    norm_slug = slug.strip().lower()
+    for file_key, path in FILES.items():
+        data = datasets[file_key][1] if file_key in datasets else load_json(path)
         for category, problems in data.items():
             for p in problems:
-                if p.get("slug", "").strip().lower() == slug.strip().lower():
+                if p.get("slug", "").strip().lower() == norm_slug:
                     found.append(f"{file_key}.json → {category}")
     return found
+
+
+def update_solution_everywhere(slug, solution):
+    """Sync `solution` into every existing entry matching slug, across both
+    companies.json and patterns.json — regardless of which file(s) the user
+    targeted for adding."""
+    norm_slug = slug.strip().lower()
+    updated = []
+    for file_key, path in FILES.items():
+        data = load_json(path)
+        changed = False
+        for category, problems in data.items():
+            for p in problems:
+                if p.get("slug", "").strip().lower() == norm_slug:
+                    p["solution"] = solution
+                    changed = True
+                    updated.append(f"{file_key}.json → {category}")
+        if changed:
+            save_json(path, data)
+    return updated
 
 
 def confirm(entry, targets_with_categories):
@@ -149,13 +173,14 @@ def main():
 
     dupes = find_duplicates(entry["slug"], datasets)
     if dupes:
-        print(f"\n[WARNING] Slug '{entry['slug']}' already exists in:")
+        print(f"\n[INFO] Slug '{entry['slug']}' already exists in:")
         for loc in dupes:
             print(f"  • {loc}")
-        answer = input("Add anyway? [y/N]: ").strip().lower()
-        if answer != "y":
-            print("Aborted.")
-            return
+        print("Syncing the solution into all existing copies instead of adding a duplicate entry...")
+        updated = update_solution_everywhere(entry["slug"], entry["solution"])
+        for loc in updated:
+            print(f"[SUCCESS] Updated solution in {loc}")
+        return
 
     if not confirm(entry, targets_with_categories):
         print("Aborted.")

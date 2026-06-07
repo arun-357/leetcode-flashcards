@@ -3250,7 +3250,7 @@
       "link": "https://leetcode.com/problems/target-sum",
       "slug": "target-sum",
       "description": "You are given an integer array \nnums\n and an integer \ntarget\n.\n\n\nYou want to build an \nexpression\n out of nums by adding one of the symbols \n'+'\n and \n'-'\n before each integer in nums and then concatenate all the integers.\n\n\n\n\nFor example, if \nnums = [2, 1]\n, you can add a \n'+'\n before \n2\n and a \n'-'\n before \n1\n and concatenate them to build the expression \n\"+2-1\"\n.\n\n\n\n\nReturn the number of different \nexpressions\n that you can build, which evaluates to \ntarget\n.\n\n\n \n\n\nExample 1:\n\n\n\n\nInput:\n nums = [1,1,1,1,1], target = 3\n\nOutput:\n 5\n\nExplanation:\n There are 5 ways to assign symbols to make the sum of nums be target 3.\n-1 + 1 + 1 + 1 + 1 = 3\n+1 - 1 + 1 + 1 + 1 = 3\n+1 + 1 - 1 + 1 + 1 = 3\n+1 + 1 + 1 - 1 + 1 = 3\n+1 + 1 + 1 + 1 - 1 = 3\n\n\n\nExample 2:\n\n\n\n\nInput:\n nums = [1], target = 1\n\nOutput:\n 1\n\n\n\n \n\n\nConstraints:\n\n\n\n\n1 <= nums.length <= 20\n\n\n0 <= nums[i] <= 1000\n\n\n0 <= sum(nums[i]) <= 1000\n\n\n-1000 <= target <= 1000",
-      "solution": "\nimport collections\n\nclass Solution(object):\n    def findTargetSumWays(self, nums, S):\n        \"\"\"\n        :type nums: List[int]\n        :type S: int\n        :rtype: int\n        \"\"\"\n        def subsetSum(nums, S):\n            dp = collections.defaultdict(int)\n            dp[0] = 1\n            for n in nums:\n                for i in reversed(xrange(n, S+1)):\n                    if i-n in dp:\n                        dp[i] += dp[i-n]\n            return dp[S]\n\n        total = sum(nums)\n        if total < S or (S + total) % 2: return 0\n        P = (S + total) // 2\n        return subsetSum(nums, P)",
+      "solution": "class Solution:\n    def findTargetSumWays(self, nums: List[int], target: int) -> int:\n\n        # dp = { running_total : number_of_ways_to_reach_it }\n        # base case — before any numbers, we're at sum 0 in exactly 1 way\n        dp = defaultdict(int)\n        dp[0] = 1\n\n        for num in nums:\n            # fresh dict each round — every num MUST get + or -\n            # no copy needed since there's no \"skip\" option\n            next_dp = defaultdict(int)\n\n            for tot, count in dp.items():\n                next_dp[tot - num] += count   # assign - to num\n                next_dp[tot + num] += count   # assign + to num\n                # if two paths land on same total, counts merge via +=\n\n            dp = next_dp  # current round becomes previous for next num\n\n        # number of ways all nums were assigned +/- to reach target\n        return dp[target]\n",
       "explanation": "N/A",
       "time_complexity": "O(n * S)",
       "space_complexity": "O(S)"
@@ -3266,6 +3266,18 @@
       "explanation": "N/A",
       "time_complexity": "O(2^n)",
       "space_complexity": "O(2^n)"
+    },
+    {
+      "title": "partition-equal-subset-sum",
+      "difficulty": "MEDIUM",
+      "category": "",
+      "link": "https://leetcode.com/problems/partition-equal-subset-sum",
+      "slug": "partition-equal-subset-sum",
+      "description": "Given an integer array nums, return true if you can partition the array into two subsets such that the sum of the elements in both subsets is equal or false otherwise.\n\n \n\nExample 1:\n\nInput: nums = [1,5,11,5]\nOutput: true\nExplanation: The array can be partitioned as [1, 5, 5] and [11].\n",
+      "solution": "class Solution:\n    def canPartition(self, nums: List[int]) -> bool:\n        \n        # odd total → impossible to split into two equal halves\n        if sum(nums) % 2 != 0:\n            return False\n        \n        target = sum(nums) // 2\n\n        # dp = all sums reachable using elements seen so far\n        # 0 is always reachable (pick nothing)\n        dp = {0}\n\n        for num in nums:\n            # snapshot current reachable sums before processing this num\n            # — so we don't use the same num twice in one round\n            new_dp = dp.copy()          # \"skip num\" — all old sums carry over\n\n            for n in dp:\n                new_dp.add(n + num)     # \"take num\" — extend each old sum by num\n\n            dp = new_dp\n\n            # early exit — no need to process remaining numbers\n            if target in dp:\n                return True\n\n        return target in dp             # final check if early exit never triggered\n",
+      "explanation": "N/A",
+      "time_complexity": "o(n * target)",
+      "space_complexity": "O(target)"
     }
   ],
   "Unbounded Knapsack DP": [
