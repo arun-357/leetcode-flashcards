@@ -1,6 +1,6 @@
-# LeetDeck
+# [LeetDeck]([url](https://leetcode-flashcards.netlify.app/))
 
-A dark, terminal-aesthetic flashcard app for grinding LeetCode. Browse by company or pattern, flip cards to reveal solutions with syntax-highlighted Python, and track your progress.
+A dark, terminal-aesthetic flashcard app for grinding LeetCode. Browse by company or pattern, flip cards to reveal solutions with syntax-highlighted Python, and track your progress. Demo: https://leetcode-flashcards.netlify.app/
 
 ## Stack
 
