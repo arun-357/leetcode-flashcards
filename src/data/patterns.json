@@ -3340,6 +3340,18 @@
       "explanation": "N/A",
       "time_complexity": "O(n * sqrt(n))",
       "space_complexity": "O(n)"
+    },
+    {
+      "title": "Minimum Cost For Tickets",
+      "difficulty": "MEDIUM",
+      "category": "",
+      "link": "https://leetcode.com/problems/minimum-cost-for-tickets",
+      "slug": "minimum-cost-for-tickets",
+      "description": "You have planned some train traveling one year in advance. The days of the year in which you will travel are given as an integer array days. Each day is an integer from 1 to 365.\n\nTrain tickets are sold in three different ways:\n\na 1-day pass is sold for costs[0] dollars,\na 7-day pass is sold for costs[1] dollars, and\na 30-day pass is sold for costs[2] dollars.\nThe passes allow that many days of consecutive travel.\n\nFor example, if we get a 7-day pass on day 2, then we can travel for 7 days: 2, 3, 4, 5, 6, 7, and 8.\nReturn the minimum number of dollars you need to travel every day in the given list of days.\n\n \n\nExample 1:\n\nInput: days = [1,4,6,7,8,20], costs = [2,7,15]\nOutput: 11\nExplanation: For example, here is one way to buy passes that lets you travel your travel plan:\nOn day 1, you bought a 1-day pass for costs[0] = $2, which covered day 1.\nOn day 3, you bought a 7-day pass for costs[1] = $7, which covered days 3, 4, ..., 9.\nOn day 20, you bought a 1-day pass for costs[0] = $2, which covered day 20.\nIn total, you spent $11 and covered all the days of your travel.",
+      "solution": "class Solution:\n    def mincostTickets(self, days: list[int], costs: list[int]) -> int:\n        \"\"\"\n        Problem:    Minimum cost to travel on given days using 1/7/30-day passes.\n        Approach:   1D DP over calendar days, forward iteration.\n        Time:       O(W) where W = last travel day (at most 365)\n        Space:      O(W)\n        \"\"\"\n        travel_days = set(days)                        # O(1) lookup for travel day check\n        last_day = days[-1]\n        dp = [0] * (last_day + 1)                     # dp[i] = min cost to cover all trips up to day i\n\n        for i in range(1, last_day + 1):\n            if i not in travel_days:\n                dp[i] = dp[i - 1]                     # no travel today — carry forward, no cost\n            else:\n                one_day  = dp[i - 1]          + costs[0]   # 1-day  pass bought today\n                seven_day  = dp[max(0, i - 7)]  + costs[1]   # 7-day  pass: covers back to i-6\n                thirty_day = dp[max(0, i - 30)] + costs[2]   # 30-day pass: covers back to i-29\n                dp[i] = min(one_day, seven_day, thirty_day)\n\n        return dp[last_day]\n\n        # -----------------------------------------------------------------------\n        # KEY DECISION: max(0, i - k) caps the lookback so we never go negative.\n        #   When i < 7,  i-7  would be negative → clamp to dp[0] = 0 (no prior cost)\n        #   When i < 30, i-30 would be negative → same\n        #\n        # NON-TRAVEL DAYS: dp[i] = dp[i-1] is critical — it propagates the current\n        #   best cost forward so travel days always have a valid base to build on.\n        #\n        # STRUCTURE: not classic knapsack — no capacity axis. Instead DP moves\n        #   forward through a calendar, deciding at each travel day which pass\n        #   would have been cheapest to cover up to that point.\n        # -----------------------------------------------------------------------\n",
+      "explanation": "N/A",
+      "time_complexity": "O(W) where W = days[-1]",
+      "space_complexity": "O(W) where W = days[-1]"
     }
   ],
   "Longest Increasing Subsequence DP": [
